@@ -12,18 +12,26 @@
 #include <sstream>
 #include "shader.h"
 
+#include "io/keyboard.h"
+#include "io/mouse.h"
+#include "io/joystick.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void proccessInput(GLFWwindow* window);
 
 float mixVal = 0.5f;
 
+glm::mat4 mouseTransform = glm::mat4(1.0f);
+glm::mat4 trans = glm::mat4(1.0f);
+Keyboard keyboard;
+
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
-	glm::mat4 trans = glm::mat4(1.0f);
+	
 	//trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 
 	int success;
 	char infoLog[512];
@@ -57,6 +65,12 @@ int main()
 	}
 	glViewport(0, 0, 1024, 780);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetKeyCallback(window, Keyboard::keyCallback);
+	glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);
+	glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
+	glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
+
+
 	Shader shader("assets/vertex_core.glsl", "assets/fragment_core.glsl");
 
 	unsigned int texture1,texture2;
@@ -133,7 +147,7 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indecies), indecies, GL_STATIC_DRAW);
 
-	trans = glm::rotate(trans, glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//trans = glm::rotate(trans, glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	
 	shader.activate();
 	shader.setInt("texture1", 0);
@@ -154,7 +168,7 @@ int main()
 		glBindVertexArray(VAO);
 		shader.activate();
 		shader.setFloat("mixValue", mixVal);
-	//	shader.setMat4("transform", trans);
+		shader.setMat4("transform", trans);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,0);
 
 		glfwPollEvents();
@@ -174,16 +188,33 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 void proccessInput(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (Keyboard::key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window,true);
 	}
-	if (glfwGetKey(window, GLFW_KEY_KP_ADD) == GLFW_PRESS)
+	if (Keyboard::key(GLFW_KEY_KP_ADD))
 	{
-		mixVal += 0.001f;
+		mixVal += 0.1f;
 	}
-	if (glfwGetKey(window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS)
+	if (Keyboard::key(GLFW_KEY_KP_SUBTRACT))
 	{
-		mixVal -= 0.001f;
+		mixVal -= 0.1f;
+	}
+	if (Keyboard::keyWentDown(GLFW_KEY_W))
+	{
+		trans = glm::translate(trans, glm::vec3(0.0f, 0.01f, 0.0f));
+
+	}
+	if (Keyboard::keyWentDown(GLFW_KEY_S))
+	{
+		trans = glm::translate(trans, glm::vec3(0.0f, -0.01f, 0.0f));
+	}
+	if (Keyboard::keyWentDown(GLFW_KEY_A))
+	{
+		trans = glm::translate(trans, glm::vec3(-0.01f, 0.0f, 0.0f));
+	}
+	if (Keyboard::keyWentDown(GLFW_KEY_D))
+	{
+		trans = glm::translate(trans, glm::vec3(0.01f, 0.0f, 0.0f));
 	}
 }
