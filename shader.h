@@ -23,6 +23,7 @@ public:
 	GLuint compileShader(const char* filepath, GLenum type);
 
 	void setMat4(const std::string& name, glm::mat4 val);
-
+	void setInt(const std::string& name, int val);
+	void setFloat(const std::string& name, float val);
 };
 #endif

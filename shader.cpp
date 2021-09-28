@@ -53,8 +53,8 @@ GLuint Shader::compileShader(const char* filepath, GLenum type)
 {
 	int success;
 	char infoLog[512];
-
-	GLuint ret = glCreateShader(type);
+	
+	unsigned int ret = glCreateShader(type);
 	std::string shaderSrc = loadShaderSrc(filepath);
 	const GLchar* shader = shaderSrc.c_str();
 	glShaderSource(ret, 1, &shader, NULL);
@@ -73,4 +73,14 @@ GLuint Shader::compileShader(const char* filepath, GLenum type)
 void Shader::setMat4(const std::string& name, glm::mat4 val)
 {
 	glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE,glm::value_ptr(val));
+}
+
+void Shader::setInt(const std::string& name, int val)
+{
+	glUniform1i(glGetUniformLocation(id, name.c_str()),val);
+}
+
+void Shader::setFloat(const std::string& name, float val)
+{
+	glUniform1f(glGetUniformLocation(id, name.c_str()), val);
 }
