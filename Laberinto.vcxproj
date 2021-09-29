@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="io\camera.cpp" />
     <ClCompile Include="io\joystick.cpp" />
     <ClCompile Include="io\keyboard.cpp" />
     <ClCompile Include="io\mouse.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="io\camera.h" />
     <ClInclude Include="io\joystick.h" />
     <ClInclude Include="io\keyboard.h" />
     <ClInclude Include="io\mouse.h" />
