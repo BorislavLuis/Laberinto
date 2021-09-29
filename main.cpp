@@ -27,7 +27,7 @@ unsigned int SCR_HEIGHT = 780;
 Keyboard keyboard;
 Camera camera(glm::vec3(0.0f,0.0f,3.0f));
 double deltaTime = 0.0f;
-float lastFrame = 0.0f;
+double lastFrame = 0.0f;
 
 float x, y, z;
 int main()
@@ -185,8 +185,9 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		double currentTime = glfwGetTime();
-		deltaTime - currentTime - lastFrame;
+		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
+		std::cout << currentTime  <<"   " << deltaTime << std::endl;
 		proccessInput(window,deltaTime);
 
 		glClearColor(0.0, 0.8, 0.4, 1.0);
