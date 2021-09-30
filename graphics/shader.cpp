@@ -1,6 +1,14 @@
 #include "shader.h"
 
+Shader::Shader()
+{
+}
+
 Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
+{
+	generate(vertexShaderPath, fragmentShaderPath);
+}
+void Shader::generate(const char* vertexShaderPath, const char* fragmentShaderPath)
 {
 	int success;
 	char infoLog[512];
@@ -11,7 +19,7 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
 	glAttachShader(id, vertexShader);
 	glAttachShader(id, fragmentShader);
 	glLinkProgram(id);
-	
+
 	glGetProgramiv(id, GL_LINK_STATUS, &success);
 	if (!success)
 	{
@@ -21,6 +29,7 @@ Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath)
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
+
 
 void Shader::activate()
 {

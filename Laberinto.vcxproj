@@ -152,20 +152,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="io\camera.cpp" />
     <ClCompile Include="io\joystick.cpp" />
     <ClCompile Include="io\keyboard.cpp" />
     <ClCompile Include="io\mouse.cpp" />
+    <ClCompile Include="io\screen.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="graphics\shader.cpp" />
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="graphics\texture.h" />
     <ClInclude Include="io\camera.h" />
     <ClInclude Include="io\joystick.h" />
     <ClInclude Include="io\keyboard.h" />
     <ClInclude Include="io\mouse.h" />
-    <ClInclude Include="shader.h" />
+    <ClInclude Include="graphics\shader.h" />
+    <ClInclude Include="io\screen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
