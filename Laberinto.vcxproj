@@ -152,6 +152,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="graphics\mesh.cpp" />
+    <ClCompile Include="graphics\model.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="io\camera.cpp" />
     <ClCompile Include="io\joystick.cpp" />
@@ -163,6 +165,9 @@
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="graphics\mesh.h" />
+    <ClInclude Include="graphics\model.h" />
+    <ClInclude Include="graphics\models\cube.hpp" />
     <ClInclude Include="graphics\texture.h" />
     <ClInclude Include="io\camera.h" />
     <ClInclude Include="io\joystick.h" />
@@ -170,6 +175,16 @@
     <ClInclude Include="io\mouse.h" />
     <ClInclude Include="graphics\shader.h" />
     <ClInclude Include="io\screen.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\object.fs" />
+    <None Include="assets\object.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\alien.jpg" />
+    <Image Include="assets\textures\alien.png" />
+    <Image Include="assets\textures\earth.jpg" />
+    <Image Include="assets\textures\forest1.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
