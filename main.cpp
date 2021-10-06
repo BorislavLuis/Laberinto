@@ -13,6 +13,7 @@
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 #include "graphics/models/cube.hpp"
+#include "graphics/models/lamp.hpp"
 
 #include "io/keyboard.h"
 #include "io/mouse.h"
@@ -20,7 +21,6 @@
 #include "io/camera.h"
 #include "io/screen.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void proccessInput(double dt);
 
 float mixVal = 0.5f;
@@ -70,11 +70,14 @@ int main()
 
 
 	Shader shader("assets/object.vs", "assets/object.fs");
+	Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
 	shader.activate();
-	Cube cube(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
+	Cube cube(Material::mix(Material::gold, Material::emerald),glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
 	cube.init();
 	
+	Lamp lamp(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(-3.0f, -0.5f, -1.0f), glm::vec3(0.5f));
+	lamp.init();
 	x = 0.0f;
 	y = 0.0f;
 	z = 3.0f;
@@ -88,31 +91,35 @@ int main()
 
 		screen.update();
 		shader.activate();
-
+		shader.set3Float("light.position", lamp.pos);
+		shader.set3Float("viewPos", camera.cameraPos);
+		shader.set3Float("light.ambient", lamp.ambient);
+		shader.set3Float("light.diffuse", lamp.diffuse);
+		shader.set3Float("light.specular", lamp.specular);
+		
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
 		view = camera.getViewMatrix();
 		projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
-		shader.setFloat("mixValue", mixVal);
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 		
 		cube.render(shader);
+		lampShader.activate();
+		lampShader.setMat4("view", view);
+		lampShader.setMat4("projection", projection);
+
+		lamp.render(lampShader);
 		screen.newFrame();
 	}
 
 	cube.cleanup();
+	//lamp.cleanup();
 	glfwTerminate();
 	return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-	SCR_WIDTH = width;
-	SCR_HEIGHT = height;
-}
 void proccessInput(double dt)
 {
 	if (Keyboard::key(GLFW_KEY_ESCAPE) == GLFW_PRESS)

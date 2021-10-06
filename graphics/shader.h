@@ -28,5 +28,8 @@ public:
 	void setMat4(const std::string& name, glm::mat4 val);
 	void setInt(const std::string& name, int val);
 	void setFloat(const std::string& name, float val);
+	void set3Float(const std::string& name, glm::vec3 v);
+	void set3Float(const std::string& name, float v1, float v2, float v3);
+
 };
 #endif

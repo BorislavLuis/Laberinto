@@ -54,6 +54,9 @@
     <ClCompile Include="graphics\model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\shader.h">
@@ -86,10 +89,17 @@
     <ClInclude Include="graphics\models\cube.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\models\lamp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\object.vs" />
     <None Include="assets\object.fs" />
+    <None Include="assets\lamp.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">
