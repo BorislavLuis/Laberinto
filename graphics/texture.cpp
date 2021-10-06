@@ -36,6 +36,7 @@ void Texture::load(bool flip)
 		case 4: 
 			colorMode = GL_RGBA;
 		break;
+		
 	}
 
 	if (data)

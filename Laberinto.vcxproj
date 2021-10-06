@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="graphics\light.cpp" />
     <ClCompile Include="graphics\material.cpp" />
     <ClCompile Include="graphics\mesh.cpp" />
     <ClCompile Include="graphics\model.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />
     <ClInclude Include="graphics\mesh.h" />
     <ClInclude Include="graphics\model.h" />
@@ -188,6 +190,7 @@
     <Image Include="assets\textures\alien.jpg" />
     <Image Include="assets\textures\alien.png" />
     <Image Include="assets\textures\earth.jpg" />
+    <Image Include="assets\textures\earthSpec.jpg" />
     <Image Include="assets\textures\forest1.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
