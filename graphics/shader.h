@@ -7,9 +7,11 @@
 #include <sstream>
 #include <iostream>
 
+#include <assimp/scene.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <glm/gtc/matrix_transform.hpp>
 
 class Shader
 {
@@ -30,6 +32,8 @@ public:
 	void setFloat(const std::string& name, float val);
 	void set3Float(const std::string& name, glm::vec3 v);
 	void set3Float(const std::string& name, float v1, float v2, float v3);
+	void set4Float(const std::string& name, aiColor4D color);
+	void set4Float(const std::string& name, glm::vec4 v);
 
 };
 #endif

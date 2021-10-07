@@ -12,11 +12,8 @@ public:
 
     Material material;
 
-    Cube() {}
-	Cube(Material material,glm::vec3 pos,glm::vec3 size)
-		:material(material),pos(pos),size(size)
-	{}
-
+    Cube(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f))
+        :Model(pos,size){}
 	void init()
 	{
 		int noVertices = 36;
@@ -70,26 +67,12 @@ public:
 			indices[i] = i;
 		}
 
-		Texture texture1("assets/textures/flag.png", "material.diffuse");
-		texture1.load();
-        Texture textureSpec("assets/textures/flag_specular.png", "material.specular");
-        textureSpec.load();
-        meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices, { texture1 , textureSpec}));
-	}
-	void render(Shader& shader)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, pos);
-		model = glm::scale(model, size);
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f,0.0f,0.0f));
-		
-		shader.setMat4("model", model);
-        shader.set3Float("material.ambient", material.ambient);
-        //shader.set3Float("material.diffuse", material.diffuse);
-       // shader.set3Float("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
+		//Texture texture1("assets/textures/flag.png", "material.diffuse");
+		//texture1.load();
+  //      Texture textureSpec("assets/textures/flag_specular.png", "material.specular");
+  //      textureSpec.load();
 
-		Model::render(shader);
+        meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices));
 	}
 };
 
