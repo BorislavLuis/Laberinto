@@ -25,7 +25,7 @@ public:
 	void init();
 	void loadModel(std::string path);
 
-	void render(Shader& shader);
+	void render(Shader& shader,bool setMode=true);
 	void cleanup();
 protected:
 	bool noTex;

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Sorbas, Spain
+* source:	https://sketchfab.com/3d-models/sorbas-spain-8515f607d667442e8e8a7730b937dc57
+* author:	Sara Carena (https://sketchfab.com/saracarena1)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Sorbas, Spain" (https://sketchfab.com/3d-models/sorbas-spain-8515f607d667442e8e8a7730b937dc57) by Sara Carena (https://sketchfab.com/saracarena1) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

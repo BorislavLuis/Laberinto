@@ -16,6 +16,7 @@
 #include "graphics/models/lamp.hpp"
 #include "graphics/light.h"
 #include "graphics/model.h"
+#include "graphics/models/gun.hpp"
 
 #include "io/keyboard.h"
 #include "io/mouse.h"
@@ -32,7 +33,8 @@ unsigned int SCR_HEIGHT = 780;
 Screen screen;
 
 Keyboard keyboard;
-Camera camera(glm::vec3(0.0f,0.0f,3.0f));
+
+Camera camera(glm::vec3(0.0f,0.0f,0.0f));
 double deltaTime = 0.0f;
 double lastFrame = 0.0f;
 bool flashLightOn = true;
@@ -76,8 +78,10 @@ int main()
 
 	shader.activate();
 	
-	Model m(glm::vec3(0.0f,0.0f,-5.0f),glm::vec3(0.05f),true);
-	m.loadModel("assets/textures/models/m4a1/scene.gltf");
+	//Model m(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.05f),true);
+	//m.loadModel("assets/textures/models/m4a1/scene.gltf");
+	Gun g;
+	g.loadModel("assets/textures/models/m4a1/scene.gltf");
 
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
 			glm::vec4(0.1f,0.1f,0.1f,1.0f),
@@ -103,7 +107,7 @@ int main()
 
 	SpotLight s = {
 		camera.cameraPos,camera.cameraFront,
-		glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(20.0f)),1.0f,0.05f,0.025f,
+		glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(20.0f)),1.0f,0.07f,0.032f,
 		glm::vec4(0.0f,0.0f,0.0f,1.0f),
 		glm::vec4(1.0f,1.0f,1.0f,1.0f),
 		glm::vec4(1.0f,1.0f,1.0f,1.0f)};
@@ -118,6 +122,7 @@ int main()
 		lastFrame = currentTime;
 		proccessInput(deltaTime);
 
+		Camera::defaultCamera = camera;
 		screen.update();
 		shader.activate();
 		shader.set3Float("viewPos", camera.cameraPos);
@@ -151,7 +156,8 @@ int main()
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 		
-		m.render(shader);
+		//m.render(shader);
+		g.render(shader);
 
 		lampShader.activate();
 		lampShader.setMat4("view", view);
@@ -165,7 +171,8 @@ int main()
 		screen.newFrame();
 	}
 	
-	m.cleanup();
+	//m.cleanup();
+	g.cleanup();
 	for (int i = 0; i < 4; i++)
 	{
 		lamps[i].cleanup();

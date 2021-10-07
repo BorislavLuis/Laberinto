@@ -7,14 +7,17 @@ Model::Model(glm::vec3 pos, glm::vec3 size,bool noTex)
 void Model::init(){}
 
 
-void Model::render(Shader& shader)
+void Model::render(Shader& shader,bool setModel)
 {
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, pos);
-	model = glm::scale(model, size);
-	shader.setMat4("model", model);
+	if (setModel)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, pos);
+		//model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, size);
+		shader.setMat4("model", model);
+	}
 	shader.setFloat("material.shininess", 0.5f);
-
 	for (Mesh mesh : meshes)
 	{
 		mesh.render(shader);
@@ -130,7 +133,6 @@ std::vector<Texture> Model::loadTextures(aiMaterial* mat, aiTextureType type)
 	{
 		aiString str;
 		mat->GetTexture(type, i, &str);
-		std::cout << str.C_Str() << std::endl;
 
 		bool skip = false;
 		for (unsigned int j = 0; j < textures_loaded.size(); j++)

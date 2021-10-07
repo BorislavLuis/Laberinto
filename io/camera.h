@@ -36,7 +36,10 @@ public:
 	float getZoom();
 
 	glm::mat4 getViewMatrix();
+
+	static Camera defaultCamera;
 private:
 	void updateCameraVectors();
+	
 };
 #endif // !CAMERA_H
