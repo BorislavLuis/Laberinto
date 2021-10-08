@@ -7,13 +7,13 @@
 class Gun : public Model
 {
 public:
-	Gun() : Model(glm::vec3(0.0f), glm::vec3(0.05f), true) {}
+	Gun() : Model(glm::vec3(0.0f), glm::vec3(1/300.0f), true) {}
 
 	void render(Shader shader, bool setModel = false)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 
-		pos = Camera::defaultCamera.cameraPos + glm::vec3(Camera::defaultCamera.cameraFront*8.0f)-glm::vec3(Camera::defaultCamera.cameraUp*3.15f);
+		pos = Camera::defaultCamera.cameraPos + glm::vec3(Camera::defaultCamera.cameraFront*0.5f)-glm::vec3(Camera::defaultCamera.cameraUp*0.205f);
 		model = glm::translate(model, pos);
 		float theta;
 

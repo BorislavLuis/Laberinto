@@ -17,6 +17,7 @@
 #include "graphics/light.h"
 #include "graphics/model.h"
 #include "graphics/models/gun.hpp"
+#include "graphics/models/sphere.hpp"
 
 #include "io/keyboard.h"
 #include "io/mouse.h"
@@ -80,9 +81,11 @@ int main()
 	
 	//Model m(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.05f),true);
 	//m.loadModel("assets/textures/models/m4a1/scene.gltf");
-	Gun g;
-	g.loadModel("assets/textures/models/m4a1/scene.gltf");
-
+	//Gun g;
+	//g.loadModel("assets/textures/models/m4a1/scene.gltf");
+	Sphere sphere(glm::vec3(0.0f),glm::vec3(0.25f));
+	sphere.init();
+	
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
 			glm::vec4(0.1f,0.1f,0.1f,1.0f),
 			glm::vec4(0.4f,0.4f,0.4f,1.0f),
@@ -157,8 +160,8 @@ int main()
 		shader.setMat4("projection", projection);
 		
 		//m.render(shader);
-		g.render(shader);
-
+		//g.render(shader);
+		sphere.render(shader);
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
@@ -172,7 +175,8 @@ int main()
 	}
 	
 	//m.cleanup();
-	g.cleanup();
+	//g.cleanup();
+	sphere.cleanup();
 	for (int i = 0; i < 4; i++)
 	{
 		lamps[i].cleanup();
