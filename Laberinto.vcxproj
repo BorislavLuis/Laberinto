@@ -164,6 +164,8 @@
     <ClCompile Include="io\screen.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="graphics\shader.cpp" />
+    <ClCompile Include="physics\environment.cpp" />
+    <ClCompile Include="physics\rigidbody.cpp" />
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +176,7 @@
     <ClInclude Include="graphics\models\cube.hpp" />
     <ClInclude Include="graphics\models\gun.hpp" />
     <ClInclude Include="graphics\models\lamp.hpp" />
+    <ClInclude Include="graphics\models\modelarray.hpp" />
     <ClInclude Include="graphics\models\sphere.hpp" />
     <ClInclude Include="graphics\texture.h" />
     <ClInclude Include="io\camera.h" />
@@ -182,6 +185,8 @@
     <ClInclude Include="io\mouse.h" />
     <ClInclude Include="graphics\shader.h" />
     <ClInclude Include="io\screen.h" />
+    <ClInclude Include="physics\environment.h" />
+    <ClInclude Include="physics\rigidbody.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\lamp.fs" />

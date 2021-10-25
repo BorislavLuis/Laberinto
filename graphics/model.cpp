@@ -1,18 +1,22 @@
 #include "model.h"
-
+#include "../physics/environment.h"
 
 Model::Model(glm::vec3 pos, glm::vec3 size,bool noTex)
-	:pos(pos),size(size),noTex(noTex){}
+	:size(size),noTex(noTex){
+	rb.pos = pos;
+	//rb.acceleration = Environment::gravitationalAcceleration;
+}
 
 void Model::init(){}
 
 
-void Model::render(Shader& shader,bool setModel)
+void Model::render(Shader& shader,float dt,bool setModel)
 {
+	rb.update(dt);
 	if (setModel)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, pos);
+		model = glm::translate(model, rb.pos);
 		//model = glm::rotate(model, glm::radians(-180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, size);
 		shader.setMat4("model", model);
