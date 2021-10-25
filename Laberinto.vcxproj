@@ -189,6 +189,7 @@
     <ClInclude Include="physics\rigidbody.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\instanced\instanced.vs" />
     <None Include="assets\lamp.fs" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />

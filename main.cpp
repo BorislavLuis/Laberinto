@@ -82,7 +82,8 @@ int main()
 
 
 	Shader shader("assets/object.vs", "assets/object.fs");
-	Shader lampShader("assets/object.vs", "assets/lamp.fs");
+	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
+	Shader launchShader("assets/instanced/instanced.vs", "assets/object.fs");
 
 	shader.activate();
 	
@@ -201,7 +202,9 @@ int main()
 		}
 		if (launchObjects.instances.size() > 0)
 		{
-			launchObjects.render(shader, dt);
+			launchShader.setMat4("view", view);
+			launchShader.setMat4("projection", projection);
+			launchObjects.render(launchShader, dt);
 		}
 		lampShader.activate();
 		lampShader.setMat4("view", view);
@@ -226,7 +229,7 @@ void launchItem(float dt)
 	//float zx = z / x;
 	//RigidBody rb(1.0f, Camera::defaultCamera.cameraPos + glm::vec3(/*zx */0.0f, 0.0f,/*xz */ 0.0f));
 	RigidBody rb(1.0f, g.rb.pos);
-	rb.applyImpulse(Camera::defaultCamera.cameraFront, 100000.0f, dt);
+	rb.transferEnergy(10000.0f, Camera::defaultCamera.cameraFront);
 	rb.applyAcceleration(Environment::gravitationalAcceleration);
 	launchObjects.instances.push_back(rb);
 }

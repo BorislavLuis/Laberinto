@@ -22,17 +22,17 @@ public:
 	//glm::vec3 pos;
 	RigidBody rb;
 	glm::vec3 size;
-
+	std::vector<Mesh> meshes;
 	Model(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f), bool noTex = false);
 	
 	void init();
 	void loadModel(std::string path);
 
-	void render(Shader& shader,float dt,bool setMode=true);
+	void render(Shader& shader,float dt,bool setMode=true,bool doRender = true);
 	void cleanup();
 protected:
 	bool noTex;
-	std::vector<Mesh> meshes;
+	
 	std::string directory;
 	std::vector<Texture> textures_loaded;
 

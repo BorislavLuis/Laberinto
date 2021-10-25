@@ -40,7 +40,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiCo
 	setup();
 }
 
-void Mesh::render(Shader shader)
+void Mesh::render(Shader shader,bool doRender)
 {
 	if (noTex)
 	{
@@ -70,12 +70,13 @@ void Mesh::render(Shader shader)
 			textures[i].bind();
 		}
 	}
-
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES,indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-	glActiveTexture(GL_TEXTURE0);
-
+	if (doRender)
+	{
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+		glActiveTexture(GL_TEXTURE0);
+	}
 }
 
 void Mesh::cleanup()
