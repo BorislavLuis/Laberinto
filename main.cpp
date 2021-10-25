@@ -184,7 +184,7 @@ int main()
 		shader.setMat4("projection", projection);
 		g.render(shader, dt);
 		//std::cout << g.rb.pos.x << " - " << g.rb.pos.y << " - " << g.rb.pos.z << std::endl;
-		std::cout << Camera::defaultCamera.cameraFront.x << " - " << Camera::defaultCamera.cameraFront.y << " - " << Camera::defaultCamera.cameraFront.z << std::endl;
+		//std::cout << Camera::defaultCamera.cameraFront.x << " - " << Camera::defaultCamera.cameraFront.y << " - " << Camera::defaultCamera.cameraFront.z << std::endl;
 		std::stack<int> removeObjects;
 		for (int i = 0; i < launchObjects.instances.size(); i++)
 		{
@@ -220,12 +220,13 @@ int main()
 void launchItem(float dt)
 {
 	
-	float x = Camera::defaultCamera.cameraFront.x;
-	float z = Camera::defaultCamera.cameraFront.z;
-	float xz = x / z;
-	float zx = z / x;
-	RigidBody rb(1.0f, Camera::defaultCamera.cameraPos + glm::vec3(zx*5.0f,0.0f,xz*5.0f));
-	rb.applyImpulse(Camera::defaultCamera.cameraFront, 1000.0f, dt);
+	//float x = Camera::defaultCamera.cameraFront.x;
+	//float z = Camera::defaultCamera.cameraFront.z;
+	//float xz = x / z;
+	//float zx = z / x;
+	//RigidBody rb(1.0f, Camera::defaultCamera.cameraPos + glm::vec3(/*zx */0.0f, 0.0f,/*xz */ 0.0f));
+	RigidBody rb(1.0f, g.rb.pos);
+	rb.applyImpulse(Camera::defaultCamera.cameraFront, 100000.0f, dt);
 	rb.applyAcceleration(Environment::gravitationalAcceleration);
 	launchObjects.instances.push_back(rb);
 }
@@ -273,6 +274,10 @@ void proccessInput(double dt)
 	}
 
 	if (Keyboard::keyWentDown(GLFW_KEY_F))
+	{
+		launchItem(dt);
+	}
+	if (Mouse::buttonWentDown(GLFW_MOUSE_BUTTON_1))
 	{
 		launchItem(dt);
 	}

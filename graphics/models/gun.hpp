@@ -24,7 +24,7 @@ public:
 		glm::vec2 front2D = glm::vec2(Camera::defaultCamera.cameraFront.x, Camera::defaultCamera.cameraFront.z);
 		theta = acos(glm::dot(glm::vec2(1.0f, 0.0f), front2D)/glm::length(front2D));
 		model = glm::rotate(model, Camera::defaultCamera.cameraFront.z < 0 ? theta : -theta, Camera::defaultCamera.worldUp);
-
+		
 		model = glm::scale(model, size);
 		shader.setMat4("model", model);
 		Model::render(shader, dt,setModel);
