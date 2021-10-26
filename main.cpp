@@ -82,7 +82,7 @@ int main()
 
 
 	Shader shader("assets/object.vs", "assets/object.fs");
-	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
+	Shader lampShader("assets/object.vs", "assets/lamp.fs");
 	Shader launchShader("assets/instanced/instanced.vs", "assets/object.fs");
 
 	shader.activate();
@@ -152,35 +152,58 @@ int main()
 
 		Camera::defaultCamera = camera;
 		screen.update();
+		
 		shader.activate();
 		shader.set3Float("viewPos", camera.cameraPos);
+		launchShader.activate();
+		launchShader.set3Float("viewPos", camera.cameraPos);
+
+
 		dirLight.direction = 
 			glm::rotate(glm::mat4(1.0f), glm::radians(0.05f), glm::vec3(1.0f, 0.0f, 0.0f))*
 			glm::vec4(dirLight.direction,1.0f);
-
+		
+		shader.activate();
 		dirLight.render(shader);
+		launchShader.activate();
+		dirLight.render(launchShader);
+		
 		for (int i = 0; i < 4; i++)
 		{
+			shader.activate();
 			lamps.lightInstances[i].render(shader, i);
+			launchShader.activate();
+			lamps.lightInstances[i].render(launchShader, i);
 		}
+
+		shader.activate();
 		shader.setInt("noPointLights", 4);
-		//lamp.pointLight.render(shader);
+		launchShader.activate();
+		launchShader.setInt("noPointLights", 4);
+		// lamp.pointLight.render(shader);
+		shader.activate();
 		if (flashLightOn)
 		{
 			s.position = camera.cameraPos;
 			s.direction = camera.cameraFront;
 			s.render(shader, 0);
+			shader.activate();
 			shader.setInt("noSpotLights", 4);
+			launchShader.activate();
+			launchShader.setInt("noSpotLights", 4);
 		}
 		else
 		{
+			shader.activate();
 			shader.setInt("noSpotLights", 0);
+			launchShader.activate();
+			launchShader.setInt("noSpotLights", 0);
 		}
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
 		view = camera.getViewMatrix();
 		projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-
+		shader.activate();
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 		g.render(shader, dt);
@@ -202,6 +225,7 @@ int main()
 		}
 		if (launchObjects.instances.size() > 0)
 		{
+			launchShader.activate();
 			launchShader.setMat4("view", view);
 			launchShader.setMat4("projection", projection);
 			launchObjects.render(launchShader, dt);

@@ -36,6 +36,7 @@ void Shader::activate()
 	glUseProgram(id);
 }
 
+
 std::string Shader::loadShaderSrc(const char* filename)
 {
 	std::ifstream file;

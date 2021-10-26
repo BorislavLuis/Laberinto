@@ -59,7 +59,7 @@ public:
 		}
 
 		shader.setMat4("model", glm::mat4(1.0f));
-		model.render(shader, dt,false,false);
+		model.render(shader, dt,false,true);
 		int size = std::min(UPPER_BOUND, (int)positions.size());
 		if (positions.size() != 0)
 		{

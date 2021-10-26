@@ -22,10 +22,15 @@ void Model::render(Shader& shader,float dt,bool setModel,bool doRender)
 		shader.setMat4("model", model);
 	}
 	shader.setFloat("material.shininess", 0.5f);
-	for (Mesh mesh : meshes)
+	
+	for (unsigned int i = 0; i < meshes.size(); i++)
 	{
-		mesh.render(shader,doRender);
+		meshes[i].render(shader, doRender);
 	}
+	//for (Mesh mesh : meshes)
+	//{
+	//	mesh.render(shader,doRender);
+	//}
 }
 
 void Model::cleanup()
