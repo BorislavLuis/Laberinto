@@ -27,17 +27,5 @@ public:
 		model = Sphere(glm::vec3(0.0f), glm::vec3(0.25f));
 		ModelArray::init();
 	}
-	void render(Shader shader, float dt)
-	{
-		positions.clear();
-		sizes.clear();
-		for (RigidBody& rb : instances)
-		{
-			rb.update(dt);
-			positions.push_back(rb.pos);
-			sizes.push_back(model.size);
-		}
-		ModelArray::render(shader, dt, false);
-	}
 };
 #endif

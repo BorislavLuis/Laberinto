@@ -7,9 +7,6 @@
 class Cube:public Model
 {
 public:
-	glm::vec3 pos;
-	glm::vec3 size;
-
     Material material;
 
     Cube(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f))
@@ -74,10 +71,10 @@ public:
 
         meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices));
 	}
-    void render(Shader shader, float dt,bool setModel = true, bool doRender = true)
-    {
-        Model::render(shader, dt,true, true);
-    }
+    //void render(Shader shader, float dt,bool setModel = true, bool doRender = true)
+    //{
+    //    Model::render(shader, dt,setModel, doRender);
+    //}
 
 };
 

@@ -173,6 +173,7 @@
     <ClInclude Include="graphics\material.h" />
     <ClInclude Include="graphics\mesh.h" />
     <ClInclude Include="graphics\model.h" />
+    <ClInclude Include="graphics\models\box.hpp" />
     <ClInclude Include="graphics\models\cube.hpp" />
     <ClInclude Include="graphics\models\gun.hpp" />
     <ClInclude Include="graphics\models\lamp.hpp" />
@@ -190,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\instanced\instanced.vs" />
+    <None Include="assets\instanced\box.fs" />
     <None Include="assets\lamp.fs" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
@@ -200,6 +202,9 @@
     <Image Include="assets\textures\earth.jpg" />
     <Image Include="assets\textures\earthSpec.jpg" />
     <Image Include="assets\textures\forest1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\instanced\box.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

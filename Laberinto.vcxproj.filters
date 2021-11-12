@@ -122,12 +122,16 @@
     <ClInclude Include="graphics\models\modelarray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\models\box.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\object.vs" />
     <None Include="assets\object.fs" />
     <None Include="assets\lamp.fs" />
     <None Include="assets\instanced\instanced.vs" />
+    <None Include="assets\instanced\box.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">
@@ -145,5 +149,8 @@
     <Image Include="assets\textures\earthSpec.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\instanced\box.vs" />
   </ItemGroup>
 </Project>

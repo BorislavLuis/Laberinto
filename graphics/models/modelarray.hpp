@@ -44,7 +44,7 @@ public:
 			glBindVertexArray(0);
 		}
 	}
-	void render(Shader shader, float dt,bool setLists=true)
+	void render(Shader shader, float dt, bool setLists = true)
 	{
 		if (setLists)
 		{
@@ -71,13 +71,13 @@ public:
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		}
-		for (unsigned int i = 0, lenght = model.meshes.size(); i < lenght; i++)
-		{
-			glBindVertexArray(model.meshes[i].VAO);
-			glDrawElementsInstanced(GL_TRIANGLES, model.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, size);
-			glBindVertexArray(0);
-		}
 
+			for (unsigned int i = 0, lenght = model.meshes.size(); i < lenght; i++)
+			{
+				glBindVertexArray(model.meshes[i].VAO);
+				glDrawElementsInstanced(GL_TRIANGLES, model.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, size);
+				glBindVertexArray(0);
+			}
 	}
 	void setSize(glm::vec3 size)
 	{

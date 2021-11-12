@@ -27,7 +27,8 @@ public:
 	void render(Shader shader,float dt,bool setModel=true,bool doRender=true)
 	{
 		shader.set3Float("lightColor", lightColor);
-		Cube::render(shader,dt, setModel,true);
+		Model::render(shader, dt, setModel, doRender);
+		//Cube::render(shader,dt, setModel,doRender);
 	}
 };
 

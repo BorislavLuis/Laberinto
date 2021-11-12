@@ -19,6 +19,7 @@
 #include "graphics/model.h"
 #include "graphics/models/gun.hpp"
 #include "graphics/models/sphere.hpp"
+#include "graphics/models/box.hpp"
 
 #include "physics/environment.h"
 
@@ -45,6 +46,8 @@ double dt = 0.0f;
 double lastFrame = 0.0f;
 bool flashLightOn = true;
 float x, y, z;
+
+Box box;
 
 SphereArray launchObjects;
 int main()
@@ -82,8 +85,10 @@ int main()
 
 
 	Shader shader("assets/object.vs", "assets/object.fs");
-	Shader lampShader("assets/object.vs", "assets/lamp.fs");
+	//Shader lampShader("assets/object.vs", "assets/lamp.fs");
+	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
 	Shader launchShader("assets/instanced/instanced.vs", "assets/object.fs");
+	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
 
 	shader.activate();
 	
@@ -92,6 +97,7 @@ int main()
 
 	g.loadModel("assets/textures/models/m4a1/scene.gltf");
 	launchObjects.init();
+	box.init();
 
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
 			glm::vec4(0.1f,0.1f,0.1f,1.0f),
@@ -111,15 +117,6 @@ int main()
 	float k0 = 1.0f;
 	float k1 = 0.09f;
 	float k2 = 0.032f;
-
-	//Lamp lamps[4];
-	//for (unsigned int i = 0; i < 4; i++) {
-	//	lamps[i] = Lamp(glm::vec3(1.0f),
-	//		ambient,diffuse,specular,
-	//		k0,k1,k2,
-	//		pointLightPositions[i], glm::vec3(0.25f));
-	//	lamps[i].init();
-	//}
 
 	LampArray lamps;
 	lamps.init();
@@ -167,9 +164,10 @@ int main()
 		dirLight.render(shader);
 		launchShader.activate();
 		dirLight.render(launchShader);
-		
+
 		for (int i = 0; i < 4; i++)
 		{
+
 			shader.activate();
 			lamps.lightInstances[i].render(shader, i);
 			launchShader.activate();
@@ -180,7 +178,7 @@ int main()
 		shader.setInt("noPointLights", 4);
 		launchShader.activate();
 		launchShader.setInt("noPointLights", 4);
-		// lamp.pointLight.render(shader);
+	
 		shader.activate();
 		if (flashLightOn)
 		{
@@ -201,7 +199,7 @@ int main()
 		}
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
-		view = camera.getViewMatrix();
+		view = Camera::defaultCamera.getViewMatrix();
 		projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 		shader.activate();
 		shader.setMat4("view", view);
@@ -236,10 +234,18 @@ int main()
 
 		lamps.render(lampShader, dt);
 		
+		if (box.offsets.size() > 0)
+		{
+			boxShader.activate();
+			boxShader.setMat4("view", view);
+			boxShader.setMat4("projection", projection);
+			box.render(boxShader);
+		}
 		screen.newFrame();
 	}
 	g.cleanup();
 	lamps.cleanup();
+	box.cleanup();
 	launchObjects.cleanup();
 	glfwTerminate();
 	return 0;
@@ -307,6 +313,11 @@ void proccessInput(double dt)
 	if (Mouse::buttonWentDown(GLFW_MOUSE_BUTTON_1))
 	{
 		launchItem(dt);
+	}
+	if (Keyboard::keyWentDown(GLFW_KEY_I))
+	{
+		box.offsets.push_back(glm::vec3(box.offsets.size() * 1));
+		box.sizes.push_back(glm::vec3(box.sizes.size() * 0.5f));
 	}
 
 	double dx = Mouse::getDX();
