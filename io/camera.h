@@ -37,7 +37,7 @@ public:
 
 	glm::mat4 getViewMatrix();
 
-	static Camera defaultCamera;
+	//static Camera defaultCamera;
 private:
 	void updateCameraVectors();
 	

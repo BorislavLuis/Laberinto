@@ -27,7 +27,10 @@
 #include "io/mouse.h"
 #include "io/joystick.h"
 #include "io/camera.h"
-#include "io/screen.h"
+
+#include "scene.h"
+
+float test = 1.0;
 
 void proccessInput(double dt);
 void launchItem(float dt);
@@ -36,18 +39,17 @@ float mixVal = 0.5f;
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 780;
 
-Screen screen;
+Scene scene;
 
 Keyboard keyboard;
 
-Camera camera(glm::vec3(0.0f,0.0f,0.0f));
 Gun g;
 double dt = 0.0f;
 double lastFrame = 0.0f;
 bool flashLightOn = true;
 float x, y, z;
 
-Box box;
+
 
 SphereArray launchObjects;
 int main()
@@ -58,32 +60,14 @@ int main()
 	char infoLog[512];
 	std::cout << vec.x << " " << vec.y << " " << vec.z << " " << std::endl;
 	std::cout << "Hello world" << std::endl;
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-	if (!screen.init())
+	scene = Scene(3, 3, "Laberinto", 1024, 780);
+	if (scene.init())
 	{
-		std::cout << "Couldn't create window" << std::endl;
+		std::cout << "Could not open window " << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize glad" << std::endl;
-		return -1;
-	}
-
-	screen.setParameters();
-	glEnable(GL_DEPTH_TEST);
-
-
 	Shader shader("assets/object.vs", "assets/object.fs");
 	//Shader lampShader("assets/object.vs", "assets/lamp.fs");
 	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
@@ -92,11 +76,11 @@ int main()
 
 	shader.activate();
 	
-	//Model m(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.05f),true);
-	//m.loadModel("assets/textures/models/m4a1/scene.gltf");
-
+	Model m(BoundTypes::AABB, glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.05f),false);
+	m.loadModel("assets/textures/models/lotr_troll/scene.gltf");
 	g.loadModel("assets/textures/models/m4a1/scene.gltf");
 	launchObjects.init();
+	Box box;
 	box.init();
 
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
@@ -140,8 +124,10 @@ int main()
 	y = 0.0f;
 	z = 3.0f;
 
-	while (!screen.shouldClose())
+	while (!scene.shouldClose())
 	{
+		box.positions.clear();
+		box.sizes.clear();
 		double currentTime = glfwGetTime();
 		dt = currentTime - lastFrame;
 		lastFrame = currentTime;
@@ -188,6 +174,7 @@ int main()
 			shader.activate();
 			shader.setInt("noSpotLights", 4);
 			launchShader.activate();
+			s.render(launchShader, 0);
 			launchShader.setInt("noSpotLights", 4);
 		}
 		else
@@ -200,11 +187,13 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
 		view = Camera::defaultCamera.getViewMatrix();
-		projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		projection = glm::perspective(glm::radians(camera.getZoom()), (float)Scene::scrWidth / (float)Scene::scrHeigt, 0.1f, 1000.0f);
 		shader.activate();
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
-		g.render(shader, dt);
+		
+		m.render(shader, dt,&box,true,true);
+		g.render(shader, dt, &box);
 		//std::cout << g.rb.pos.x << " - " << g.rb.pos.y << " - " << g.rb.pos.z << std::endl;
 		//std::cout << Camera::defaultCamera.cameraFront.x << " - " << Camera::defaultCamera.cameraFront.y << " - " << Camera::defaultCamera.cameraFront.z << std::endl;
 		std::stack<int> removeObjects;
@@ -226,19 +215,20 @@ int main()
 			launchShader.activate();
 			launchShader.setMat4("view", view);
 			launchShader.setMat4("projection", projection);
-			launchObjects.render(launchShader, dt);
+			launchObjects.render(launchShader, dt, &box);
 		}
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
 
-		lamps.render(lampShader, dt);
+		lamps.render(lampShader, dt, &box);
 		
-		if (box.offsets.size() > 0)
+		if (box.positions.size() > 0)
 		{
 			boxShader.activate();
 			boxShader.setMat4("view", view);
 			boxShader.setMat4("projection", projection);
+			//boxShader.set3Float("siz", glm::vec3(10.0,15.0f,20.0f));
 			box.render(boxShader);
 		}
 		screen.newFrame();
@@ -277,30 +267,6 @@ void proccessInput(double dt)
 	{
 		mixVal -= 0.1f;
 	}
-	if (Keyboard::key(GLFW_KEY_W))
-	{
-		camera.updateCameraPos(CameraDirection::FORWARD, dt);
-	}
-	if (Keyboard::key(GLFW_KEY_S))
-	{
-		camera.updateCameraPos(CameraDirection::BACKWARD, dt);
-	}
-	if (Keyboard::key(GLFW_KEY_D))
-	{
-		camera.updateCameraPos(CameraDirection::RIGHT, dt);
-	}
-	if (Keyboard::key(GLFW_KEY_A))
-	{
-		camera.updateCameraPos(CameraDirection::LEFT, dt);
-	}
-	if (Keyboard::key(GLFW_KEY_SPACE))
-	{
-		camera.updateCameraPos(CameraDirection::UP, dt);
-	}
-	if (Keyboard::key(GLFW_KEY_LEFT_SHIFT))
-	{
-		camera.updateCameraPos(CameraDirection::DOWN, dt);
-	}
 	if (Keyboard::keyWentDown(GLFW_KEY_L))
 	{
 		flashLightOn = !flashLightOn;
@@ -313,11 +279,6 @@ void proccessInput(double dt)
 	if (Mouse::buttonWentDown(GLFW_MOUSE_BUTTON_1))
 	{
 		launchItem(dt);
-	}
-	if (Keyboard::keyWentDown(GLFW_KEY_I))
-	{
-		box.offsets.push_back(glm::vec3(box.offsets.size() * 1));
-		box.sizes.push_back(glm::vec3(box.sizes.size() * 0.5f));
 	}
 
 	double dx = Mouse::getDX();

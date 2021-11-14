@@ -1,6 +1,6 @@
 #include "camera.h"
 #include <iostream>
-Camera Camera::defaultCamera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+//Camera Camera::defaultCamera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
 
 Camera::Camera(glm::vec3 position)
 	:cameraPos(position),

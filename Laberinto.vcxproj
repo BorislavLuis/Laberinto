@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="algorithms\bounds.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="graphics\light.cpp" />
     <ClCompile Include="graphics\material.cpp" />
@@ -161,14 +162,17 @@
     <ClCompile Include="io\joystick.cpp" />
     <ClCompile Include="io\keyboard.cpp" />
     <ClCompile Include="io\mouse.cpp" />
-    <ClCompile Include="io\screen.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="graphics\shader.cpp" />
     <ClCompile Include="physics\environment.cpp" />
     <ClCompile Include="physics\rigidbody.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="algorithms\bounds.h" />
+    <ClInclude Include="algorithms\states.hpp" />
+    <ClInclude Include="graphics\glmemory.hpp" />
     <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />
     <ClInclude Include="graphics\mesh.h" />
@@ -185,9 +189,9 @@
     <ClInclude Include="io\keyboard.h" />
     <ClInclude Include="io\mouse.h" />
     <ClInclude Include="graphics\shader.h" />
-    <ClInclude Include="io\screen.h" />
     <ClInclude Include="physics\environment.h" />
     <ClInclude Include="physics\rigidbody.h" />
+    <ClInclude Include="scene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\instanced\instanced.vs" />
@@ -195,6 +199,8 @@
     <None Include="assets\lamp.fs" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
+    <None Include="assets\textures\models\lotr_troll\scene.bin" />
+    <None Include="assets\textures\models\lotr_troll\scene.gltf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\alien.jpg" />
@@ -202,6 +208,13 @@
     <Image Include="assets\textures\earth.jpg" />
     <Image Include="assets\textures\earthSpec.jpg" />
     <Image Include="assets\textures\forest1.jpg" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_baseColor.png" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_metallicRoughness.png" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_normal.png" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_baseColor.jpeg" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_emissive.jpeg" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_metallicRoughness.png" />
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_normal.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\instanced\box.vs" />

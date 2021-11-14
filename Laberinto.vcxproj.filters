@@ -42,9 +42,6 @@
     <ClCompile Include="io\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="io\screen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="graphics\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,6 +63,12 @@
     <ClCompile Include="physics\environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="algorithms\bounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\shader.h">
@@ -81,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="io\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="io\screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphics\texture.h">
@@ -125,6 +125,18 @@
     <ClInclude Include="graphics\models\box.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="algorithms\bounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\glmemory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithms\states.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\object.vs" />
@@ -132,6 +144,10 @@
     <None Include="assets\lamp.fs" />
     <None Include="assets\instanced\instanced.vs" />
     <None Include="assets\instanced\box.fs" />
+    <None Include="assets\textures\models\lotr_troll\scene.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="assets\textures\models\lotr_troll\scene.gltf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">
@@ -147,6 +163,27 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\textures\earthSpec.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_baseColor.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_normal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_normal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_baseColor.jpeg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_emissive.jpeg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_metallicRoughness.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_metallicRoughness.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

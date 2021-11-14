@@ -26,21 +26,21 @@ std::vector<Vertex> Vertex::genList(float* vertices, int noVertices)
 	return ret;
 }
 
-Mesh::Mesh(){}
+//Mesh::Mesh(){}
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
-		:vertices(vertices),indices(indices),textures(textures),noTex(false)
+Mesh::Mesh(BoundingRegion br,std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
+		:br(br),vertices(vertices),indices(indices),textures(textures),noTex(false)
 {
 	setup();
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse, aiColor4D specular)
-	:vertices(vertices),indices(indices),diffuse(diffuse),specular(specular),noTex(true)
+Mesh::Mesh(BoundingRegion br,std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse, aiColor4D specular)
+	: br(br),vertices(vertices),indices(indices),diffuse(diffuse),specular(specular),noTex(true)
 {	
 	setup();
 }
 
-void Mesh::render(Shader shader,bool doRender)
+void Mesh::render(Shader shader, glm::vec3 pos, glm::vec3 size, Box* box, bool doRender)
 {
 	if (noTex)
 	{
@@ -72,41 +72,39 @@ void Mesh::render(Shader shader,bool doRender)
 	}
 	if (doRender)
 	{
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		box->addInstance(br, pos, size);
+		VAO.bind();
+		VAO.draw(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		ArrayObject::clear();
 		glActiveTexture(GL_TEXTURE0);
 	}
 }
 
-void Mesh::cleanup()
-{
-	glDeleteVertexArrays(1,&VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-}
-
 void Mesh::setup()
 {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	VAO.generate();
+	VAO.bind();
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+	VAO["EBO"] = BufferObject(GL_ELEMENT_ARRAY_BUFFER);
+	VAO["EBO"].generate();
+	VAO["EBO"].bind();
+	VAO["EBO"].setData<GLuint>(indices.size(), &indices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-	
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,sizeof(Vertex), (void*)offsetof(Vertex,pos));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+	VAO["VBO"] = BufferObject(GL_ARRAY_BUFFER);
+	VAO["VBO"].generate();
+	VAO["VBO"].bind();
+	VAO["VBO"].setData<Vertex>(vertices.size(), &vertices[0], GL_STATIC_DRAW);
 
+	VAO["VBO"].setAttPointer<GLfloat>(0, 3, GL_FLOAT, 8, 0);
+	VAO["VBO"].setAttPointer<GLfloat>(1, 3, GL_FLOAT, 8, 3);
+	VAO["VBO"].setAttPointer<GLfloat>(2, 3, GL_FLOAT, 8, 6);
 
-	glBindVertexArray(0);
+	VAO["VBO"].clear();
+
+	ArrayObject::clear();
+}
+void Mesh::cleanup()
+{
+	VAO.cleanup();
 
 }

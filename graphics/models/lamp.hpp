@@ -24,10 +24,10 @@ public:
 		pointLight({pos,k0,k1,k2,ambient,diffuse,specular}),
 		Cube(pos,size){}
 
-	void render(Shader shader,float dt,bool setModel=true,bool doRender=true)
+	void render(Shader shader,float dt, Box* box,bool setModel=true,bool doRender=true)
 	{
 		shader.set3Float("lightColor", lightColor);
-		Model::render(shader, dt, setModel, doRender);
+		Model::render(shader, dt,box, setModel, doRender);
 		//Cube::render(shader,dt, setModel,doRender);
 	}
 };
@@ -47,7 +47,7 @@ public:
 			glm::vec3(0.0f), glm::vec3(0.25f));
 		ModelArray::init();
 	}
-	void render(Shader shader, float dt)
+	void render(Shader shader, float dt, Box* box)
 	{
 		positions.clear();
 		sizes.clear();
@@ -56,7 +56,7 @@ public:
 			positions.push_back(pl.position);
 			sizes.push_back(model.size);
 		}
-		ModelArray::render(shader, dt, false);
+		ModelArray::render(shader, dt,box, false);
 	}
 };
 

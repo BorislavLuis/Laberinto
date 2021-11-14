@@ -7,6 +7,10 @@
 #include <glm/glm.hpp>
 #include "shader.h"
 #include "texture.h"
+#include "glmemory.hpp"
+
+#include "models/box.hpp"
+#include "../algorithms/bounds.h"
 
 struct Vertex
 {
@@ -22,18 +26,20 @@ typedef struct Vertex Vertex;
 class Mesh
 {
 public:
+	BoundingRegion br;
+
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	unsigned int VAO;
+	ArrayObject VAO;
 
 	std::vector<Texture> textures;
 	aiColor4D diffuse;
 	aiColor4D specular;
 
-	Mesh();
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures = {});
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse, aiColor4D specular);
-	void render(Shader shader,bool doRender=true);
+	//Mesh();
+	Mesh(BoundingRegion br,std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures = {});
+	Mesh(BoundingRegion br,std::vector<Vertex> vertices, std::vector<unsigned int> indices, aiColor4D diffuse, aiColor4D specular);
+	void render(Shader shader,glm::vec3 pos,glm::vec3 size,Box* box,bool doRender=true);
 	void cleanup();
 
 private:
