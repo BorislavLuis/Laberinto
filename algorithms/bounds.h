@@ -20,7 +20,7 @@ public:
 	glm::vec3 min;
 	glm::vec3 max;
 
-	BoundingRegion(BoundTypes type);
+	BoundingRegion(BoundTypes type = BoundTypes::AABB);
 	BoundingRegion(glm::vec3 center, float radius);
 	BoundingRegion(glm::vec3 min, glm::vec3 max);
 

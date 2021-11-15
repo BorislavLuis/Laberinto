@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algorithms\bounds.cpp" />
+    <ClCompile Include="algorithms\octree.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="graphics\light.cpp" />
     <ClCompile Include="graphics\material.cpp" />
@@ -171,6 +172,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algorithms\bounds.h" />
+    <ClInclude Include="algorithms\list.hpp" />
+    <ClInclude Include="algorithms\octree.h" />
     <ClInclude Include="algorithms\states.hpp" />
     <ClInclude Include="graphics\glmemory.hpp" />
     <ClInclude Include="graphics\light.h" />

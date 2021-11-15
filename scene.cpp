@@ -14,7 +14,7 @@ Scene::Scene(){}
 
 Scene::Scene(int glfwVersionMajor, int glfwVersionMinor, const char* title, unsigned int scrWidth, unsigned int scrHeight)
 	:glfwVersionMajor(glfwVersionMajor),glfwVersionMinor(glfwVersionMinor),
-	title(title),activeCamera(-1)
+	title(title),activeCamera(-1),activePointLights(0),activeSpotLights(0)
 {
 	Scene::scrWidth = scrWidth;
 	Scene::scrHeight = scrHeight;
@@ -48,14 +48,14 @@ bool Scene::init()
 		return false;
 	}
 	glViewport(0, 0, scrWidth, scrHeight);
-	glfwSetFramebufferSizeCallback(window, glfwSetFramebufferSizeCallback);
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetKeyCallback(window, Keyboard::keyCallback);
 	glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);
 	glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
 	glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
 	glEnable(GL_DEPTH_TEST);
-	glfwSetInputMode(window, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR,GLFW_CURSOR_DISABLED);
 	
 	return true;
 }
@@ -64,14 +64,9 @@ void Scene::processInput(float dt)
 {
 	if (activeCamera != -1 && activeCamera < cameras.size())
 	{
-		if (Mouse::getDY() != 0 && Mouse::getDY() != 0)
-		{
-			cameras[activeCamera]->updateCameraDirection(Mouse::getDX(), Mouse::getDY());
-		}
-		if (Mouse::getScrollDY() != 0)
-		{
-			cameras[activeCamera]->updateCameraZoom(Mouse::getScrollDY());
-		}
+		cameras[activeCamera]->updateCameraDirection(Mouse::getDX(), Mouse::getDY());
+		cameras[activeCamera]->updateCameraZoom(Mouse::getScrollDY());
+
 		if (Keyboard::key(GLFW_KEY_W))
 		{
 			cameras[activeCamera]->updateCameraPos(CameraDirection::FORWARD, dt);
@@ -99,16 +94,16 @@ void Scene::processInput(float dt)
 
 		view = cameras[activeCamera]->getViewMatrix();
 		projection = glm::perspective(
-			glm::radians(cameras[activeCamera]->getZoom(),
+			glm::radians(cameras[activeCamera]->getZoom()),
 			(float)scrWidth / (float)scrHeight,
-			0.1, 100.0f);
-		cameraPos = camera[activeCamera]->cameraPos;
+			0.1f, 100.0f);
+		cameraPos = cameras[activeCamera]->cameraPos;
 	}
 }
 
 void Scene::update()
 {
-	glClearColor(bg[0], bg[1].bg[2], bg[3]);
+	glClearColor(bg[0], bg[1],bg[2], bg[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -140,11 +135,13 @@ void Scene::render(Shader shader, bool applyLighting)
 		}
 		shader.setInt("noPointLights", noActiveLights);
 		noLights = spotLights.size();
+		noActiveLights = 0;
 		for (unsigned int i = 0; i < noLights; i++)
 		{
 			if (States::isActive(&activeSpotLights, i))
 			{
 				spotLights[i]->render(shader, noActiveLights);
+				noActiveLights++;
 			}
 		}
 		shader.setInt("noSpotLights", noActiveLights);
@@ -154,22 +151,28 @@ void Scene::render(Shader shader, bool applyLighting)
 
 void Scene::cleanup()
 {
+	glfwTerminate();
 }
 
 bool Scene::shouldClose()
 {
-	return false;
+	return glfwWindowShouldClose(window);
 }
 
 Camera* Scene::getActiveCamera()
 {
-	return nullptr;
+	return (activeCamera >= 0 && activeCamera < cameras.size())? cameras[activeCamera]: nullptr;
 }
 
 void Scene::setShouldClose(bool shouldClose)
 {
+	glfwSetWindowShouldClose(window, shouldClose);
 }
 
 void Scene::setWindowColor(float r, float g, float b, float a)
 {
+	bg[0] = r;
+	bg[1] = g;
+	bg[2] = b;
+	bg[3] = a;
 }
