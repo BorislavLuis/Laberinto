@@ -94,6 +94,7 @@ void Octree::node::build()
 			children[i] = new node(octants[i], octLists[i]);
 			States::activate(&activeOctants, i);
 			children[i]->build();
+			///children[i]->parent = this; borislav 
 			hasChildren = true;
 		}
 	}
@@ -143,19 +144,110 @@ void Octree::node::update()
 			}
 			movedObjects.erase(movedObjects.begin());
 			objects.erase(objects.begin() + List::getIndexOf<BoundingRegion>(objects, movedObj));
+			current->insert(movedObj);
+		}
+	}
+	else
+	{
+		if (queue.size() > 0)
+		{
+			processPending();
 		}
 	}
 }
 
 void Octree::node::processPending()
 {
+	if (!treeBuild)
+	{
+		while (queue.size() != 0)
+		{
+			objects.push_back(queue.front());
+			queue.pop();
+		}
+		build();
+	}
+	else
+	{
+		while (queue.size() != 0)
+		{
+			insert(queue.front());
+			queue.pop();
+		}
+	}
 }
 
 bool Octree::node::insert(BoundingRegion obj)
 {
-	return false;
+	glm::vec3 dimensions = region.calculateDimensions();
+	if (objects.size() == 0 || 
+		dimensions.x < MIN_BOUNDS ||
+		dimensions.y < MIN_BOUNDS ||
+		dimensions.z < MIN_BOUNDS)
+	{
+		objects.push_back(obj);
+		return true;
+	}
+
+	if (!region.containsRegion(obj))
+	{
+		return parent == nullptr ? false : parent->insert(obj);
+	}
+
+	BoundingRegion octants[NO_CHILDREN];
+	for (int i = 0; i < NO_CHILDREN; i++)
+	{
+		if (children[i] != nullptr)
+		{
+			octants[i] = children[i]->region;
+		}
+		else
+		{
+			calculateBounds(&octants[i], (Octant)(1 << i), region);
+		}
+	}
+
+	for (int i = 0; i < NO_CHILDREN; i++)
+	{
+		if (octants[i].containsRegion(obj))
+		{
+			if (children[i] != nullptr)
+			{
+				return children[i]->insert(obj);
+			}
+			else
+			{
+				children[i] = new node(octants[i], { obj });
+				States::activate(&activeOctants, i);
+				return true;
+			}
+		}
+	}
+
+	objects.push_back(obj);
+	return true;
 }
 
 void Octree::node::destroy()
 {
+	if (children != nullptr)
+	{
+		for (int flags = activeOctants, i = 0; flags > 0; flags >> 1, i++)
+		{
+			if (States::isActive(&flags, 0))
+			{
+				if (children[i] != nullptr)
+				{
+					children[i]->destroy();
+					children[i] = nullptr;
+				}
+			}
+		}
+	}
+
+	objects.clear();
+	while (queue.size() != 0)
+	{
+		queue.pop();
+	}
 }

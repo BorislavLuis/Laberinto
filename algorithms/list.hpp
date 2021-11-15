@@ -1,7 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-namespace list
+namespace List
 {
 	template<typename T>
 	int getIndexOf(std::vector<T> v, T x)
