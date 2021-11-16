@@ -9,9 +9,9 @@
 class Gun : public Model
 {
 public:
-	Gun() : Model(BoundTypes::AABB, glm::vec3(0.0f), glm::vec3(1/300.0f), true) {}
+	Gun(unsigned int maxNoInstaces) : Model("m4a1",BoundTypes::AABB, maxNoInstaces,CONST_INSTANCES | NO_TEX) {}
 
-	void render(Shader shader,float dt, Box* box,Scene* scene, bool setModel = false)
+	void render(Shader shader,float dt,Scene* scene, bool setModel = false)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 
@@ -29,7 +29,11 @@ public:
 		
 		model = glm::scale(model, size);
 		shader.setMat4("model", model);
-		Model::render(shader, dt,box,setModel);
+		Model::render(shader, dt,scene,setModel);
+	}
+	void init()
+	{
+		loadModel("assets/textures/models/m4a1/scene.gltf");
 	}
 };
 

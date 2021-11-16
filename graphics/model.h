@@ -18,24 +18,52 @@
 #include "../physics/rigidbody.h"
 #include "../algorithms/bounds.h"
 
+#include "../scene.h"
+
+#define DYNAMIC			(unsigned int)1
+#define CONST_INSTANCES (unsigned int)2
+#define NO_TEX			(unsigned int)4
+
+class Scene;
 
 class Model
 {
 public:
-	//glm::vec3 pos;
+	
+	std::string id;
+
 	RigidBody rb;
 	glm::vec3 size;
 	
 	BoundTypes boundType;
 
 	std::vector<Mesh> meshes;
-	Model(BoundTypes boundType = BoundTypes::AABB ,glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f), bool noTex = false);
+	std::vector<RigidBody> instances;
+
+	unsigned int maxNoInstances;
+	unsigned int currentNoInstances;
+
+	unsigned int switches;
+
+	Model(std::string id, BoundTypes boundType, unsigned int maxNoInstances, unsigned int flags = 0);
+
+	virtual void init();
 	
-	void init();
+	unsigned int generateInstances(glm::vec3 size, float mass, glm::vec3 pos);
+	
+	void initInstances();
+
 	void loadModel(std::string path);
 
-	void render(Shader& shader,float dt,Box* box,bool setModel=true,bool doRender = true);
+	virtual void render(Shader shader,float dt,Scene* scene,bool setModel=true);
+	
 	void cleanup();
+
+	void removeInstance(unsigned int idx);
+
+	unsigned int getIdx(std::string id);
+
+
 protected:
 	bool noTex;
 	
@@ -46,6 +74,8 @@ protected:
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadTextures(aiMaterial* mat, aiTextureType type);
 
+	BufferObject posVBO;
+	BufferObject sizeVBO;
 };
 
 

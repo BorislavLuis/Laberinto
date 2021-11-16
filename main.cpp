@@ -45,14 +45,14 @@ Scene scene;
 Camera camera;
 Keyboard keyboard;
 
-Gun g;
+//Gun g(1);
+Model g("m4a1", BoundTypes::AABB, 1,CONST_INSTANCES);
+Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
 double dt = 0.0f;
 double lastFrame = 0.0f;
-float x, y, z;
 
+Sphere sphere(10);
 
-
-SphereArray launchObjects;
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
@@ -72,21 +72,21 @@ int main()
 	scene.cameras.push_back(&camera);
 	scene.activeCamera = 0;
 
-	Shader shader("assets/object.vs", "assets/object.fs");
+	//Shader shader("assets/object.vs", "assets/object.fs");
 	Shader gunShader("assets/object.vs", "assets/object.fs");
 	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
-	Shader launchShader("assets/instanced/instanced.vs", "assets/object.fs");
+	Shader shader("assets/instanced/instanced.vs", "assets/object.fs");
 	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
 
 	shader.activate();
 	
-	Model m(BoundTypes::AABB, glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.05f),false);
-	m.loadModel("assets/textures/models/lotr_troll/scene.gltf");
-	g.loadModel("assets/textures/models/m4a1/scene.gltf");
-	launchObjects.init();
-	Box box;
-	box.init();
+	Lamp lamp(4);
+	scene.registerModel(&lamp);
+	scene.registerModel(&sphere);
+	scene.registerModel(&g);
+	scene.registerModel(&troll);
 
+	scene.loadModels();
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
 			glm::vec4(0.1f,0.1f,0.1f,1.0f),
 			glm::vec4(0.4f,0.4f,0.4f,1.0f),
@@ -108,8 +108,6 @@ int main()
 
 	PointLight pointLights[4];
 
-	LampArray lamps;
-	lamps.init();
 	for (unsigned int i = 0; i < 4; i++)
 	{
 		pointLights[i] = {
@@ -117,10 +115,12 @@ int main()
 				k0,k1,k2,
 				ambient,diffuse,specular
 		};
-		lamps.lightInstances.push_back(pointLights[i]);
+		scene.generateInstance(lamp.id, glm::vec3(0.25),0.25,pointLightPositions[i]);
 		scene.pointLights.push_back(&pointLights[i]);
 		States::activate(&scene.activePointLights, i);
 	}
+	scene.generateInstance(g.id, glm::vec3(1.0f), 0.25f, camera.cameraFront);
+	scene.generateInstance(troll.id, glm::vec3(5.0f), 0.25f, glm::vec3(3.0, 0.5f, 2.5f));
 
 	SpotLight spotLight = {
 		camera.cameraPos,camera.cameraFront,
@@ -128,22 +128,46 @@ int main()
 		glm::vec4(0.0f,0.0f,0.0f,1.0f),glm::vec4(1.0f),glm::vec4(1.0f)};
 	scene.spotLights.push_back(&spotLight);
 	scene.activeSpotLights = 1;
-
-	x = 0.0f;
-	y = 0.0f;
-	z = 3.0f;
+	
+	scene.initInstances();
 
 	while (!scene.shouldClose())
 	{
-		box.positions.clear();
-		box.sizes.clear();
 		double currentTime = glfwGetTime();
 		dt = currentTime - lastFrame;
 		lastFrame = currentTime;
-		proccessInput(dt);
 
 		scene.update();
-		scene.render(shader);
+		proccessInput(dt);
+
+
+
+		std::stack<unsigned int> removeObjects;
+		for (int i = 0; i < sphere.currentNoInstances; i++)
+		{
+			if (glm::length(camera.cameraPos - sphere.instances[i].pos) > 250.0f)
+			{
+				removeObjects.push(i);
+			}
+		}
+		while (removeObjects.size() != 0)
+		{
+			sphere.removeInstance(removeObjects.top());
+			removeObjects.pop();
+		}
+		if (sphere.currentNoInstances > 0)
+		{
+			scene.renderShader(shader);
+			scene.renderInstances(sphere.id, shader, dt);
+		}
+		scene.renderShader(lampShader);
+		scene.renderInstances(lamp.id, lampShader, dt);
+		scene.renderShader(gunShader);
+		scene.renderInstances(g.id, gunShader, dt);
+
+		scene.renderShader(shader);
+		scene.renderInstances(troll.id, shader, dt);
+		/*scene.render(shader);
 		m.render(shader, dt, &box);
 		scene.render(gunShader);
 		g.render(gunShader, dt, &box, &scene);
@@ -174,34 +198,37 @@ int main()
 		{
 			scene.render(boxShader, false);
 			box.render(boxShader);
-		}
+		}*/
 		scene.newFrame();
 	}
 	g.cleanup();
-	lamps.cleanup();
-	box.cleanup();
-	launchObjects.cleanup();
 	scene.cleanup();
 	return 0;
 }
 void launchItem(float dt)
 {
 	
+	std::string id = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
+	if (id != "")
+	{
+		sphere.instances[scene.instances[id].second].transferEnergy(10000.0f, camera.cameraFront);
+		sphere.instances[scene.instances[id].second].applyAcceleration(Environment::gravitationalAcceleration);
+	}
 	//float x = Camera::defaultCamera.cameraFront.x;
 	//float z = Camera::defaultCamera.cameraFront.z;
 	//float xz = x / z;
 	//float zx = z / x;
-	//RigidBody rb(1.0f, Camera::defaultCamera.cameraPos + glm::vec3(/*zx */0.0f, 0.0f,/*xz */ 0.0f));
-	RigidBody rb(1.0f, g.rb.pos);
-	rb.transferEnergy(10000.0f, scene.getActiveCamera()->cameraFront);// Camera::defaultCamera.cameraFront);
-	rb.applyAcceleration(Environment::gravitationalAcceleration);
-	launchObjects.instances.push_back(rb);
+	///RigidBody rb(1.0f, Camera::defaultCamera.cameraPos + glm::vec3(/*zx */0.0f, 0.0f,/*xz */ 0.0f));
+	//RigidBody rb(1.0f, g.rb.pos);
+	//rb.transferEnergy(10000.0f, scene.getActiveCamera()->cameraFront);// Camera::defaultCamera.cameraFront);
+	//rb.applyAcceleration(Environment::gravitationalAcceleration);
+	//launchObjects.instances.push_back(rb);
 }
 void proccessInput(double dt)
 {
 	scene.processInput(dt);
 
-	if (States::isActive(&scene.activeSpotLights, 0))
+	if (States::isIndexActive(&scene.activeSpotLights, 0))
 	{
 		scene.spotLights[0]->position = scene.getActiveCamera()->cameraPos;
 		scene.spotLights[0]->direction = scene.getActiveCamera()->cameraFront;
@@ -220,14 +247,14 @@ void proccessInput(double dt)
 	}
 	if (Keyboard::keyWentDown(GLFW_KEY_L))
 	{
-		States::toggle(&scene.activeSpotLights, 0);
+		States::toggleIndex(&scene.activeSpotLights, 0);
 	}
 
 	for (int i = 0; i < 4; i++)
 	{
 		if (Keyboard::keyWentDown(GLFW_KEY_1 + i))
 		{
-			States::toggle(&scene.activePointLights, i);
+			States::toggleIndex(&scene.activePointLights, i);
 		}
 	}
 	if (Keyboard::keyWentDown(GLFW_KEY_F))

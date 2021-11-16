@@ -113,4 +113,20 @@ bool BoundingRegion::intersectsWith(BoundingRegion br)
 	}
 	
 }
+
+bool BoundingRegion::operator==(BoundingRegion br)
+{
+	if (type != br.type)
+	{
+		return false;
+	}
+	if (type == BoundTypes::AABB)
+	{
+		return min == br.min && max == br.max;
+	}
+	else
+	{
+		return center == br.center && radius == br.radius;
+	}
+}
  

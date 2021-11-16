@@ -33,6 +33,8 @@ public:
 
 	bool intersectsWith(BoundingRegion br);
 
+	bool operator ==(BoundingRegion br);
+
 
 };
 
