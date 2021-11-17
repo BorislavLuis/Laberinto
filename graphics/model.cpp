@@ -5,14 +5,14 @@ Model::Model(std::string id, BoundTypes boundType, unsigned int maxNoInstances, 
 	:id(id),boundType(boundType),switches(flags),currentNoInstances(0),maxNoInstances(maxNoInstances)
 {}
 
-unsigned int Model::generateInstances(glm::vec3 size, float mass, glm::vec3 pos)
+RigidBody* Model::generateInstances(glm::vec3 size, float mass, glm::vec3 pos)
 {
 	if (currentNoInstances >= maxNoInstances)
 	{
-		return -1;
+		return nullptr;
 	}
-	instances.push_back(RigidBody(&id, size, mass, pos));
-	return currentNoInstances++;
+	instances.push_back(new RigidBody(id, size, mass, pos));
+	return instances[currentNoInstances++];
 }
 
 void Model::initInstances()
@@ -27,8 +27,8 @@ void Model::initInstances()
 	{
 		for (unsigned int i = 0; i < currentNoInstances; i++)
 		{
-			positions.push_back(instances[i].pos);
-			sizes.push_back(instances[i].size);
+			positions.push_back(instances[i]->pos);
+			sizes.push_back(instances[i]->size);
 		}
 		if (positions.size() > 0)
 		{
@@ -63,15 +63,27 @@ void Model::initInstances()
 
 void Model::removeInstance(unsigned int idx)
 {
+	delete instances[idx];
 	instances.erase(instances.begin() + idx);
 	currentNoInstances--;
+}
+
+void Model::removeInstance(std::string instanceId)
+{
+	int idx = getIdx(instanceId);
+	if (idx != -1)
+	{
+		delete instances[idx];
+		instances.erase(instances.begin() + idx);
+		currentNoInstances--;
+	}
 }
 
 unsigned int Model::getIdx(std::string id)
 {
 	for (int i = 0; i < currentNoInstances; i++)
 	{
-		if (instances[i] == id)
+		if (instances[i]->instanceId == id)
 		{
 			return i;
 		}
@@ -94,10 +106,15 @@ void Model::render(Shader shader,float dt, Scene* scene,bool setModel)
 		{
 			if (doUpdate)
 			{
-				instances[i].update(dt);
+				instances[i]->update(dt);
+				States::activate(&instances[i]->state, INSTANCE_MOVED);
 			}
-			position.push_back(instances[i].pos);
-			sizes.push_back(instances[i].size);
+			else
+			{
+				States::deactivate(&instances[i]->state, INSTANCE_MOVED);
+			}
+			position.push_back(instances[i]->pos);
+			sizes.push_back(instances[i]->size);
 		}
 		posVBO.bind();
 		posVBO.updateData<glm::vec3>(0, currentNoInstances, &position[0]);

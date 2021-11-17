@@ -175,6 +175,7 @@
     <ClInclude Include="algorithms\list.hpp" />
     <ClInclude Include="algorithms\octree.h" />
     <ClInclude Include="algorithms\states.hpp" />
+    <ClInclude Include="algorithms\trie.hpp" />
     <ClInclude Include="graphics\glmemory.hpp" />
     <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />

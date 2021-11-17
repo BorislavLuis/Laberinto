@@ -239,6 +239,7 @@ void Octree::node::destroy()
 				if (children[i] != nullptr)
 				{
 					children[i]->destroy();
+					delete children[i];
 					children[i] = nullptr;
 				}
 			}

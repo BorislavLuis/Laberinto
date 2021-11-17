@@ -211,8 +211,8 @@ void launchItem(float dt)
 	std::string id = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
 	if (id != "")
 	{
-		sphere.instances[scene.instances[id].second].transferEnergy(10000.0f, camera.cameraFront);
-		sphere.instances[scene.instances[id].second].applyAcceleration(Environment::gravitationalAcceleration);
+		sphere.instances[sphere.getIdx(id)].transferEnergy(10000.0f, camera.cameraFront);
+		sphere.instances[sphere.getIdx(id)].applyAcceleration(Environment::gravitationalAcceleration);
 	}
 	//float x = Camera::defaultCamera.cameraFront.x;
 	//float z = Camera::defaultCamera.cameraFront.z;

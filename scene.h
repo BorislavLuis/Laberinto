@@ -17,12 +17,16 @@
 #include "io/mouse.h"
 
 #include "algorithms/states.hpp"
+#include "algorithms/trie.hpp"
+
 class Model;
 class Scene
 {
 public:
-	std::map<std::string, Model*> models;
-	std::map<std::string, std::pair<std::string, unsigned int>> instances;
+	trie::Trie<Model*> models;
+	trie::Trie<RigidBody*> instances;
+
+	std::vector<RigidBody*> instancesToDelete;
 
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -45,11 +49,13 @@ public:
 	void setWindowColor(float r, float g, float b, float a);
 
 	void registerModel(Model* model);
-	std::string generateInstance(std::string modelId, glm::vec3 size, float mass, glm::vec3 pos);
+	RigidBody* generateInstance(std::string modelId, glm::vec3 size, float mass, glm::vec3 pos);
 	
 	void initInstances();
 	void loadModels();
 	void removeInstance(std::string instanceId);
+	void markForDeletion(std::string instanceId);
+	void clearDeadInstances();
 
 
 	std::string currentId;
