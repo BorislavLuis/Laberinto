@@ -141,19 +141,12 @@ int main()
 		proccessInput(dt);
 
 
-
-		std::stack<unsigned int> removeObjects;
 		for (int i = 0; i < sphere.currentNoInstances; i++)
 		{
-			if (glm::length(camera.cameraPos - sphere.instances[i].pos) > 250.0f)
+			if (glm::length(camera.cameraPos - sphere.instances[i]->pos) > 250.0f)
 			{
-				removeObjects.push(i);
+				scene.markForDeletion(sphere.instances[i]->instanceId);
 			}
-		}
-		while (removeObjects.size() != 0)
-		{
-			sphere.removeInstance(removeObjects.top());
-			removeObjects.pop();
 		}
 		if (sphere.currentNoInstances > 0)
 		{
@@ -167,38 +160,8 @@ int main()
 
 		scene.renderShader(shader);
 		scene.renderInstances(troll.id, shader, dt);
-		/*scene.render(shader);
-		m.render(shader, dt, &box);
-		scene.render(gunShader);
-		g.render(gunShader, dt, &box, &scene);
 
-		std::stack<int> removeObjects;
-		for (int i = 0; i < launchObjects.instances.size(); i++)
-		{
-			if (glm::length(scene.getActiveCamera()->cameraPos - launchObjects.instances[i].pos) > 50.0f)
-			{
-				removeObjects.push(i);
-				continue;
-			}
-		}
-		for (int i = 0; i < removeObjects.size(); i++)
-		{
-			launchObjects.instances.erase(launchObjects.instances.begin() + removeObjects.top());
-			removeObjects.pop();
-		}
-		if (launchObjects.instances.size() > 0)
-		{
-			scene.render(launchShader);
-			launchObjects.render(launchShader, dt, &box);
-		}
-		scene.render(lampShader, false);
-		lamps.render(lampShader, dt, &box);
-
-		if (box.positions.size() > 0)
-		{
-			scene.render(boxShader, false);
-			box.render(boxShader);
-		}*/
+		scene.clearDeadInstances();
 		scene.newFrame();
 	}
 	g.cleanup();
@@ -208,11 +171,11 @@ int main()
 void launchItem(float dt)
 {
 	
-	std::string id = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
-	if (id != "")
+	RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
+	if (rb)
 	{
-		sphere.instances[sphere.getIdx(id)].transferEnergy(10000.0f, camera.cameraFront);
-		sphere.instances[sphere.getIdx(id)].applyAcceleration(Environment::gravitationalAcceleration);
+		rb->transferEnergy(10000.0f, camera.cameraFront);
+		rb->applyAcceleration(Environment::gravitationalAcceleration);
 	}
 	//float x = Camera::defaultCamera.cameraFront.x;
 	//float z = Camera::defaultCamera.cameraFront.z;

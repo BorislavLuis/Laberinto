@@ -148,7 +148,7 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 	shader.setMat4("projection", projection);
 	shader.set3Float("viewPos", cameraPos);
 
-	if (applyLighting)
+  	if (applyLighting)
 	{
 		unsigned int noLights = pointLights.size();
 		unsigned int noActiveLights = 0;
@@ -242,8 +242,8 @@ void Scene::removeInstance(std::string instanceId)
 {
 	std::string targetModel = instances[instanceId]->modelId;
 	models[targetModel]->removeInstance(instanceId);
-	delete instances[instanceId];
-	instances[instanceId] = nullptr;
+	//delete instances[instanceId];
+	//instances[instanceId] = nullptr;
 	instances.erase(instanceId);
 }
 
@@ -258,8 +258,6 @@ void Scene::clearDeadInstances()
 	for (RigidBody* rb : instancesToDelete)
 	{
 		removeInstance(rb->instanceId);
-		delete rb;
-		rb = nullptr;
 	}
 	instancesToDelete.clear();
 }
