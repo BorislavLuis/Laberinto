@@ -11,6 +11,11 @@
 #include "list.hpp"
 #include "states.hpp"
 #include "bounds.h"
+#include "trie.hpp"
+#include "../graphics/model.h"
+#include "../graphics/models/box.hpp"
+
+class Model;
 
 namespace Octree
 {
@@ -26,7 +31,7 @@ namespace Octree
 		O8 = 0x80
 	};
 
-	void calculateBounds(BoundingRegion* out, Octant octant, BoundingRegion parentRegion);
+	void calculateBounds(BoundingRegion& out, Octant octant, BoundingRegion parentRegion);
 
 	class node
 	{
@@ -40,6 +45,8 @@ namespace Octree
 		bool treeReady = false;
 		bool treeBuild = false;
 
+		short maxLifespan = 8;
+		short currentLifespan = -1;
 		std::vector<BoundingRegion> objects;
 		std::queue<BoundingRegion> queue;
 		
@@ -48,9 +55,10 @@ namespace Octree
 		node();
 		node(BoundingRegion bounds);
 		node(BoundingRegion bounds, std::vector<BoundingRegion> objectList);
-
+		
+		void addToPending(RigidBody* instance,trie::Trie<Model*> models);
 		void build();
-		void update();
+		void update(Box& box);
 		void processPending();
 		bool insert(BoundingRegion obj);
 		void destroy();

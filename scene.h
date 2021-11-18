@@ -11,6 +11,7 @@
 #include "graphics/light.h"
 #include "graphics/shader.h"
 #include "graphics/model.h"
+#include "graphics/models/box.hpp"
 
 #include "io/camera.h"
 #include "io/keyboard.h"
@@ -18,7 +19,12 @@
 
 #include "algorithms/states.hpp"
 #include "algorithms/trie.hpp"
+#include "algorithms/octree.h"
 
+namespace Octree
+{
+	class node;
+}
 class Model;
 class Scene
 {
@@ -28,6 +34,7 @@ public:
 
 	std::vector<RigidBody*> instancesToDelete;
 
+	Octree::node* octree;
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 	Scene();
@@ -35,9 +42,10 @@ public:
 		const char* title, unsigned int scrWidth, unsigned int scrHeight);
 	bool init();
 
+	void prepare(Box& box);
 	void processInput(float dt);
 	void update();
-	void newFrame();
+	void newFrame(Box& box);
 	void renderShader(Shader shader, bool applyLighting = true);
 	void renderInstances(std::string modelId, Shader shader, float dt);
 	void cleanup();

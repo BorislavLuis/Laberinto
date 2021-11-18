@@ -85,6 +85,8 @@ int main()
 	scene.registerModel(&sphere);
 	scene.registerModel(&g);
 	scene.registerModel(&troll);
+	Box box;
+	box.init();
 
 	scene.loadModels();
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
@@ -130,6 +132,7 @@ int main()
 	scene.activeSpotLights = 1;
 	
 	scene.initInstances();
+	scene.prepare(box);
 
 	while (!scene.shouldClose())
 	{
@@ -153,7 +156,7 @@ int main()
 			scene.renderShader(shader);
 			scene.renderInstances(sphere.id, shader, dt);
 		}
-		scene.renderShader(lampShader);
+		scene.renderShader(lampShader,false);
 		scene.renderInstances(lamp.id, lampShader, dt);
 		scene.renderShader(gunShader);
 		scene.renderInstances(g.id, gunShader, dt);
@@ -161,8 +164,11 @@ int main()
 		scene.renderShader(shader);
 		scene.renderInstances(troll.id, shader, dt);
 
+		scene.renderShader(boxShader,false);
+		box.render(boxShader);
+
+		scene.newFrame(box);
 		scene.clearDeadInstances();
-		scene.newFrame();
 	}
 	g.cleanup();
 	scene.cleanup();
@@ -171,7 +177,8 @@ int main()
 void launchItem(float dt)
 {
 	
-	RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
+	//RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
+	RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f), 1.0f,scene.cameras[scene.activeCamera]->cameraPos);
 	if (rb)
 	{
 		rb->transferEnergy(10000.0f, camera.cameraFront);

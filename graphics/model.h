@@ -38,6 +38,7 @@ public:
 	BoundTypes boundType;
 
 	std::vector<Mesh> meshes;
+	std::vector<BoundingRegion> boundingRegions;
 	std::vector<RigidBody*> instances;
 
 	unsigned int maxNoInstances;

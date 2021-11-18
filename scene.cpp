@@ -75,7 +75,14 @@ bool Scene::init()
 	glEnable(GL_DEPTH_TEST);
 	glfwSetInputMode(window, GLFW_CURSOR,GLFW_CURSOR_DISABLED);
 	
+	octree = new Octree::node(BoundingRegion(glm::vec3(-16.0f), glm::vec3(16.0f)));
+
 	return true;
+}
+
+void Scene::prepare(Box& box)
+{
+	octree->update(box);
 }
 
 void Scene::processInput(float dt)
@@ -134,8 +141,13 @@ void Scene::update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Scene::newFrame()
+void Scene::newFrame(Box& box)
 {
+	box.positions.clear();
+	box.sizes.clear();
+	octree->processPending();
+	octree->update(box);
+
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 }
@@ -223,6 +235,7 @@ RigidBody* Scene::generateInstance(std::string modelId, glm::vec3 size, float ma
 		std::string id = generateId();
 		rb->instanceId = id;
 		instances.insert(id ,rb);
+		octree->addToPending(rb, models);
 		return rb;
 	}
 	return nullptr;

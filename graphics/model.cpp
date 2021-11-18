@@ -161,7 +161,9 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene));
+		Mesh newMesh = processMesh(mesh, scene);
+		meshes.push_back(newMesh);
+		boundingRegions.push_back(newMesh.br);
 	}
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
@@ -217,11 +219,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	if (boundType == BoundTypes::AABB)
 	{
 		br.max = max;
+		br.ogMax = max;
 		br.min = min;
+		br.ogMin = min;
 	}
 	else
 	{
 		br.center = BoundingRegion(min, max).calculateCenter();
+		br.ogCenter = br.center;
 		float maxRadiusSquared = 0.0f;
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -237,6 +242,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			}
 		}
 		br.radius = sqrt(maxRadiusSquared);
+		br.ogRadius = br.radius;
 	}
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
