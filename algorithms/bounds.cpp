@@ -1,4 +1,5 @@
 #include "bounds.h"
+#include "octree.h"
 
 BoundingRegion::BoundingRegion(BoundTypes type)
 	:type(type){}

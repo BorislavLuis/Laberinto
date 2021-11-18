@@ -13,9 +13,10 @@
 #include "bounds.h"
 #include "trie.hpp"
 #include "../graphics/model.h"
-#include "../graphics/models/box.hpp"
 
 class Model;
+class BoundingRegion;
+class Box;
 
 namespace Octree
 {
@@ -61,6 +62,8 @@ namespace Octree
 		void update(Box& box);
 		void processPending();
 		bool insert(BoundingRegion obj);
+		void checkCollisionSelf(BoundingRegion obj);
+		void checkCollisionChildren(BoundingRegion obj);
 		void destroy();
 	};
 }
