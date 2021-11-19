@@ -41,13 +41,13 @@ void Model::initInstances()
 	posVBO = BufferObject(GL_ARRAY_BUFFER);
 	posVBO.generate();
 	posVBO.bind();
-	posVBO.setData<glm::vec3>(UPPER_BOUND, posData, GL_DYNAMIC_DRAW);
+	posVBO.setData<glm::vec3>(UPPER_BOUND, posData, usage);
 
 
 	sizeVBO = BufferObject(GL_ARRAY_BUFFER);
 	sizeVBO.generate();
 	sizeVBO.bind();
-	sizeVBO.setData<glm::vec3>(UPPER_BOUND, sizeData, GL_DYNAMIC_DRAW);
+	sizeVBO.setData<glm::vec3>(UPPER_BOUND, sizeData, usage);
 	for (unsigned int i = 0, size = meshes.size(); i < size; i++)
 	{
 

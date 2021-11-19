@@ -114,14 +114,8 @@ bool BoundingRegion::intersectsWith(BoundingRegion br)
 		float distSquared = 0.0f;
 		for (int i = 0; i < 3; i++)
 		{
-			if (center[i] < br.min[i])
-			{
-				distSquared += (br.min[i] - center[i]) * (br.min[i] - center[i]);
-			}
-			else if (center[i] > br.max[i])
-			{
-				distSquared += (center[i] - br.max[i]) * (center[i] - br.max[i]);
-			}
+			float closestPt = std::max(br.min[i], std::min(center[i], br.max[i]));
+			distSquared += (closestPt - center[i]) * (closestPt - center[i]);
 		}
 		return distSquared < (radius* radius);
 	}

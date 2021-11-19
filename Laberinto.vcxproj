@@ -204,6 +204,8 @@
     <None Include="assets\object.vs" />
     <None Include="assets\textures\models\lotr_troll\scene.bin" />
     <None Include="assets\textures\models\lotr_troll\scene.gltf" />
+    <None Include="assets\textures\models\m4a1\scene.bin" />
+    <None Include="assets\textures\models\m4a1\scene.gltf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\alien.jpg" />

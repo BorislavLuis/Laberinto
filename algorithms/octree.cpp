@@ -222,13 +222,15 @@ void Octree::node::update(Box& box)
 			movedObjects.pop();
 			current->insert(movedObj);
 
+			current = movedObj.cell;
+			current->checkCollisionSelf(movedObj);
+			current->checkCollisionChildren(movedObj);
 
-
-
-
-
-
-
+			while (current->parent)
+			{
+				current = current->parent;
+				current->checkCollisionSelf(movedObj);
+			}
 
 		}
 	}
@@ -353,7 +355,7 @@ void Octree::node::checkCollisionSelf(BoundingRegion obj)
 		{
 			if (br.instance->instanceId != obj.instance->instanceId)
 			{
-				std::cout << "instance" << br.instance->modelId;
+				std::cout << "Instance(" << br.instance->modelId << ") collides with " << obj.instance->instanceId <<"(" << obj.instance->modelId<<")"<<std::endl;
 			}
 		}
 	}
@@ -361,13 +363,24 @@ void Octree::node::checkCollisionSelf(BoundingRegion obj)
 
 void Octree::node::checkCollisionChildren(BoundingRegion obj)
 {
+	if (children)
+	{
+		for (int flags = activeOctants, i = 0; flags > 0; flags >>= 1, i++)
+		{
+			if (States::isIndexActive(&flags, 0) && children[i])
+			{
+				children[i]->checkCollisionSelf(obj);
+				children[i]->checkCollisionChildren(obj);
+			}
+		}
+	}
 }
 
 void Octree::node::destroy()
 {
 	if (children != nullptr)
 	{
-		for (int flags = activeOctants, i = 0; flags > 0; flags >> 1, i++)
+		for (int flags = activeOctants, i = 0; flags > 0; flags >>= 1, i++)
 		{
 			if (States::isIndexActive(&flags, 0))
 			{

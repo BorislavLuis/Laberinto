@@ -196,6 +196,7 @@ void Scene::renderInstances(std::string modelId, Shader shader, float dt)
 void Scene::cleanup()
 {
 	models.traverse([](Model* model)->void {model->cleanup();});
+	octree->destroy();
 	glfwTerminate();
 }
 

@@ -81,6 +81,8 @@ int main()
 	shader.activate();
 	
 	Lamp lamp(4);
+	//g.loadModel("assets/textures/models/m4a1/scene.gltf");
+	troll.loadModel("assets/textures/models/lotr_troll/scene.gltf");
 	scene.registerModel(&lamp);
 	scene.registerModel(&sphere);
 	scene.registerModel(&g);
@@ -121,8 +123,8 @@ int main()
 		scene.pointLights.push_back(&pointLights[i]);
 		States::activate(&scene.activePointLights, i);
 	}
-	scene.generateInstance(g.id, glm::vec3(1.0f), 0.25f, camera.cameraFront);
-	scene.generateInstance(troll.id, glm::vec3(5.0f), 0.25f, glm::vec3(3.0, 0.5f, 2.5f));
+	scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f, camera.cameraFront);
+	scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(3.0, 0.5f, 2.5f));
 
 	SpotLight spotLight = {
 		camera.cameraPos,camera.cameraFront,
@@ -158,8 +160,8 @@ int main()
 		}
 		scene.renderShader(lampShader,false);
 		scene.renderInstances(lamp.id, lampShader, dt);
-		scene.renderShader(gunShader);
-		scene.renderInstances(g.id, gunShader, dt);
+		//scene.renderShader(gunShader);
+		//scene.renderInstances(g.id, gunShader, dt);
 
 		scene.renderShader(shader);
 		scene.renderInstances(troll.id, shader, dt);

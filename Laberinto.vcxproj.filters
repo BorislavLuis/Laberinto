@@ -157,6 +157,10 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="assets\textures\models\lotr_troll\scene.gltf" />
+    <None Include="assets\textures\models\m4a1\scene.gltf" />
+    <None Include="assets\textures\models\m4a1\scene.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">
