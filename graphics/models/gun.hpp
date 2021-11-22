@@ -29,7 +29,7 @@ public:
 		
 		model = glm::scale(model, size);
 		shader.setMat4("model", model);
-		Model::render(shader, dt,scene,setModel);
+		Model::render(shader, dt,scene,false);
 	}
 	void init()
 	{

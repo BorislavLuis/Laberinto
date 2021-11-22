@@ -65,7 +65,16 @@ bool Scene::init()
 		glfwTerminate();
 		return false;
 	}
+
 	glViewport(0, 0, scrWidth, scrHeight);
+	GLFWimage images[1];
+	int we, he, chh;
+	unsigned char* data = stbi_load("assets/textures/earth.png", &we, &he, &chh, 0);
+	images[0].pixels = data;
+	images[0].width = we;
+	images[0].height = he;
+	glfwSetWindowIcon(window, 1, images);
+
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetKeyCallback(window, Keyboard::keyCallback);
 	glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);

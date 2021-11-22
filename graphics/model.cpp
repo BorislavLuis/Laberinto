@@ -91,7 +91,7 @@ unsigned int Model::getIdx(std::string id)
 	return -1;
 }
 
-void Model::render(Shader shader,float dt, Scene* scene,bool setModel)
+void Model::render(Shader shader, float dt, Scene* scene, bool setModel)
 {
 	if (setModel)
 	{

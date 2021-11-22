@@ -45,8 +45,8 @@ Scene scene;
 Camera camera;
 Keyboard keyboard;
 
-//Gun g(1);
-Model g("m4a1", BoundTypes::AABB, 1,CONST_INSTANCES);
+Gun g(1);
+//Model g("m4a1", BoundTypes::AABB, 1,CONST_INSTANCES);
 Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
 double dt = 0.0f;
 double lastFrame = 0.0f;
@@ -123,7 +123,7 @@ int main()
 		scene.pointLights.push_back(&pointLights[i]);
 		States::activate(&scene.activePointLights, i);
 	}
-	scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f, camera.cameraFront);
+	scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f,glm::vec3(2.0f));
 	scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(3.0, 0.5f, 2.5f));
 
 	SpotLight spotLight = {
@@ -160,8 +160,11 @@ int main()
 		}
 		scene.renderShader(lampShader,false);
 		scene.renderInstances(lamp.id, lampShader, dt);
-		//scene.renderShader(gunShader);
-		//scene.renderInstances(g.id, gunShader, dt);
+		scene.renderShader(gunShader);
+		scene.renderInstances(g.id, gunShader, dt);
+
+		//scene.renderShader(shader);
+		//scene.renderInstances(g.id, shader, dt);
 
 		scene.renderShader(shader);
 		scene.renderInstances(troll.id, shader, dt);
