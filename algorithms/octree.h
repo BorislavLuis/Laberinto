@@ -65,6 +65,7 @@ namespace Octree
 		void checkCollisionSelf(BoundingRegion obj);
 		void checkCollisionChildren(BoundingRegion obj);
 		void destroy();
+		Octree::node* findBottom(node* curr);
 	};
 }
 

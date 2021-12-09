@@ -88,7 +88,7 @@ void Octree::node::build()
 			{
 				octLists[j].push_back(br);
 				objects.erase(objects.begin()+i);
-				i++;
+				i--;
 				length--;
 				break;
 			}
@@ -134,6 +134,13 @@ void Octree::node::update(Box& box)
 				else if (currentLifespan > 0)
 				{
 					currentLifespan--;
+				}
+			}
+			else
+			{
+				if (this == findBottom(this))
+				{
+					currentLifespan = 0;
 				}
 			}
 		}
@@ -399,4 +406,18 @@ void Octree::node::destroy()
 	{
 		queue.pop();
 	}
+}
+Octree::node* Octree::node::findBottom(node* curr)
+{
+	if (curr->hasChildren)
+	{
+		for (int i = 0; i < NO_CHILDREN; i++)
+		{
+			if (curr->children[i] != nullptr)
+			{
+				return findBottom(curr->children[i]);
+			}
+		}
+	}
+	return curr;
 }
