@@ -72,6 +72,9 @@
     <ClCompile Include="algorithms\octree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\shader.h">
@@ -146,6 +149,9 @@
     <ClInclude Include="algorithms\trie.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\object.vs" />
@@ -161,6 +167,8 @@
     <None Include="assets\textures\models\m4a1\scene.bin">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="assets\text.vs" />
+    <None Include="assets\text.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">

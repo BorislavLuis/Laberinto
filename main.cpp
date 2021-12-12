@@ -32,6 +32,8 @@
 
 #include "scene.h"
 
+#include <ft2build.h>
+
 float test = 1.0;
 
 void proccessInput(double dt);
@@ -47,7 +49,7 @@ Keyboard keyboard;
 
 Gun g(1);
 //Model g("m4a1", BoundTypes::AABB, 1,CONST_INSTANCES);
-Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
+//Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
 double dt = 0.0f;
 double lastFrame = 0.0f;
 
@@ -62,7 +64,7 @@ int main()
 	std::cout << vec.x << " " << vec.y << " " << vec.z << " " << std::endl;
 	std::cout << "Hello world" << std::endl;
 
-	scene = Scene(3, 3, "Laberinto", 1024, 780);
+	scene = Scene(3, 3, "Laberinto", 1920, 1080);
 	if (!scene.init())
 	{
 		std::cout << "Could not open window " << std::endl;
@@ -77,16 +79,16 @@ int main()
 	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
 	Shader shader("assets/instanced/instanced.vs", "assets/object.fs");
 	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
-
+	Shader textShader("assets/text.vs", "assets/text.fs");
 	shader.activate();
 	
 	Lamp lamp(4);
 	//g.loadModel("assets/textures/models/m4a1/scene.gltf");
-	troll.loadModel("assets/textures/models/lotr_troll/scene.gltf");
+	//troll.loadModel("assets/textures/models/lotr_troll/scene.gltf");
 	scene.registerModel(&lamp);
 	scene.registerModel(&sphere);
-	scene.registerModel(&g);
-	scene.registerModel(&troll);
+	//scene.registerModel(&g);
+	//scene.registerModel(&troll);
 	Box box;
 	box.init();
 
@@ -123,8 +125,8 @@ int main()
 		scene.pointLights.push_back(&pointLights[i]);
 		States::activate(&scene.activePointLights, i);
 	}
-	scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f,glm::vec3(2.0f));
-	scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(3.0, 0.5f, 2.5f));
+	//scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f,glm::vec3(2.0f));
+	//scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(3.0, 0.5f, 2.5f));
 
 	SpotLight spotLight = {
 		camera.cameraPos,camera.cameraFront,
@@ -136,14 +138,23 @@ int main()
 	scene.initInstances();
 	scene.prepare(box);
 
+	scene.variableLog["time"] = (double)0.0;
+
 	while (!scene.shouldClose())
 	{
 		double currentTime = glfwGetTime();
 		dt = currentTime - lastFrame;
 		lastFrame = currentTime;
 
+		scene.variableLog["time"] += dt;
+		scene.variableLog["fps"] = 1 / dt;
 		scene.update();
 		proccessInput(dt);
+
+
+		scene.renderText("comic", textShader, "Hello, OpenGL!", 50.0f, 50.0f, glm::vec2(1.0f), glm::vec3(1.0f, 0.0f, 0.2f));
+		scene.renderText("comic", textShader, "Time: " + scene.variableLog["time"].dump(), 50.0f, 1000.0f, glm::vec2(1.0f), glm::vec3(1.0f));
+		scene.renderText("comic", textShader, "FPS: " + scene.variableLog["fps"].dump(), 50.0f, 1000.0f - 40.0f, glm::vec2(1.0f), glm::vec3(1.0f));
 
 
 		for (int i = 0; i < sphere.currentNoInstances; i++)
@@ -160,17 +171,18 @@ int main()
 		}
 		scene.renderShader(lampShader,false);
 		scene.renderInstances(lamp.id, lampShader, dt);
-		scene.renderShader(gunShader);
-		scene.renderInstances(g.id, gunShader, dt);
+		//scene.renderShader(gunShader);
+		//scene.renderInstances(g.id, gunShader, dt);
 
 		//scene.renderShader(shader);
 		//scene.renderInstances(g.id, shader, dt);
 
-		scene.renderShader(shader);
-		scene.renderInstances(troll.id, shader, dt);
+		//scene.renderShader(shader);
+		//scene.renderInstances(troll.id, shader, dt);
 
 		scene.renderShader(boxShader,false);
 		box.render(boxShader);
+
 
 		scene.newFrame(box);
 		scene.clearDeadInstances();
@@ -186,7 +198,7 @@ void launchItem(float dt)
 	RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f), 1.0f,scene.cameras[scene.activeCamera]->cameraPos);
 	if (rb)
 	{
-		rb->transferEnergy(10000.0f, camera.cameraFront);
+		rb->transferEnergy(10.0f, camera.cameraFront);
 		rb->applyAcceleration(Environment::gravitationalAcceleration);
 	}
 	//float x = Camera::defaultCamera.cameraFront.x;

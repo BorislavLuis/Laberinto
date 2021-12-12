@@ -82,10 +82,27 @@ bool Scene::init()
 	glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glfwSetInputMode(window, GLFW_CURSOR,GLFW_CURSOR_DISABLED);
 	
-	octree = new Octree::node(BoundingRegion(glm::vec3(-16.0f), glm::vec3(16.0f)));
+	octree = new Octree::node(BoundingRegion(glm::vec3(-128.0f), glm::vec3(128.0f)));
 
+	if(FT_Init_FreeType(&ft))
+	{ 
+		std::cout << "Could not init FreeType" << std::endl;
+		return false;
+	}
+
+	fonts.insert("comic", new TextRenderer(32));
+	if (!fonts["comic"]->loadFont(ft, "assets/fonts/comic.ttf"))
+	{
+		std::cout << "Could not load font" << std::endl;
+		return false;
+	}
+
+	FT_Done_FreeType(ft);
 	return true;
 }
 
@@ -139,7 +156,8 @@ void Scene::processInput(float dt)
 		projection = glm::perspective(
 			glm::radians(cameras[activeCamera]->getZoom()),
 			(float)scrWidth / (float)scrHeight,
-			0.1f, 100.0f);
+			0.1f, 1000.0f);
+		textProjection = glm::ortho(0.0f, (float)scrWidth, 0.0f, (float)scrHeight);
 		cameraPos = cameras[activeCamera]->cameraPos;
 	}
 }
@@ -202,9 +220,20 @@ void Scene::renderInstances(std::string modelId, Shader shader, float dt)
 	models[modelId]->render(shader, dt, this);
 }
 
+void Scene::renderText(std::string font, Shader shader, std::string text, float x, float y, glm::vec2 scale, glm::vec3 color)
+{
+	shader.activate();
+	shader.setMat4("projection", textProjection);
+	fonts[font]->render(shader, text, x, y,scale, color);
+}
+
 void Scene::cleanup()
 {
-	models.traverse([](Model* model)->void {model->cleanup();});
+	models.traverse([](Model* model)->void {model->cleanup(); });
+	models.cleanup();
+	instances.cleanup();
+	fonts.traverse([](TextRenderer* tr)->void {tr->cleanup(); });
+	fonts.cleanup();
 	octree->destroy();
 	glfwTerminate();
 }

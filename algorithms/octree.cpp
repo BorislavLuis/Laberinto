@@ -407,6 +407,7 @@ void Octree::node::destroy()
 		queue.pop();
 	}
 }
+
 Octree::node* Octree::node::findBottom(node* curr)
 {
 	if (curr->hasChildren)

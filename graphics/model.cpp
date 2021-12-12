@@ -1,5 +1,6 @@
 #include "model.h"
 #include "../physics/environment.h"
+#include "../scene.h"
 
 Model::Model(std::string id, BoundTypes boundType, unsigned int maxNoInstances, unsigned int flags)
 	:id(id),boundType(boundType),switches(flags),currentNoInstances(0),maxNoInstances(maxNoInstances)

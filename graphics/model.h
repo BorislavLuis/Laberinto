@@ -18,7 +18,7 @@
 #include "../physics/rigidbody.h"
 #include "../algorithms/bounds.h"
 
-#include "../scene.h"
+//#include "../scene.h"
 
 #define DYNAMIC			(unsigned int)1
 #define CONST_INSTANCES (unsigned int)2

@@ -7,10 +7,15 @@
 #include <map>
 
 #include <glm/glm.hpp>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#include <jsoncpp/json.hpp>
 
 #include "graphics/light.h"
 #include "graphics/shader.h"
 #include "graphics/model.h"
+#include "graphics/text.h"
 #include "graphics/models/box.hpp"
 
 #include "io/camera.h"
@@ -35,6 +40,12 @@ public:
 	std::vector<RigidBody*> instancesToDelete;
 
 	Octree::node* octree;
+
+	jsoncpp::json variableLog;
+
+	FT_Library ft;
+	trie::Trie<TextRenderer*> fonts;
+
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 	Scene();
@@ -48,6 +59,7 @@ public:
 	void newFrame(Box& box);
 	void renderShader(Shader shader, bool applyLighting = true);
 	void renderInstances(std::string modelId, Shader shader, float dt);
+	void renderText(std::string font, Shader shader, std::string text, float x, float y, glm::vec2 scale, glm::vec3 color);
 	void cleanup();
 
 	bool shouldClose();
@@ -79,6 +91,7 @@ public:
 	unsigned int activeCamera;
 	glm::mat4 view;
 	glm::mat4 projection;
+	glm::mat4 textProjection;
 	glm::vec3 cameraPos;
 
 protected:
