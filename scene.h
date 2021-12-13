@@ -26,6 +26,7 @@
 #include "algorithms/trie.hpp"
 #include "algorithms/octree.h"
 
+
 namespace Octree
 {
 	class node;
