@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -154,6 +154,7 @@
     <ClCompile Include="algorithms\bounds.cpp" />
     <ClCompile Include="algorithms\octree.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="graphics\cubemap.cpp" />
     <ClCompile Include="graphics\light.cpp" />
     <ClCompile Include="graphics\material.cpp" />
     <ClCompile Include="graphics\mesh.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="algorithms\octree.h" />
     <ClInclude Include="algorithms\states.hpp" />
     <ClInclude Include="algorithms\trie.hpp" />
+    <ClInclude Include="graphics\cubemap.h" />
     <ClInclude Include="graphics\glmemory.hpp" />
     <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />
