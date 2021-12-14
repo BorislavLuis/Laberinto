@@ -206,6 +206,9 @@
     <None Include="assets\lamp.fs" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
+    <None Include="assets\skybox\sky.fs" />
+    <None Include="assets\skybox\skybox.fs" />
+    <None Include="assets\skybox\skybox.vs" />
     <None Include="assets\text.fs" />
     <None Include="assets\text.vs" />
     <None Include="assets\textures\models\lotr_troll\scene.bin" />
@@ -214,6 +217,12 @@
     <None Include="assets\textures\models\m4a1\scene.gltf" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\skybox\back.png" />
+    <Image Include="assets\skybox\bottom.png" />
+    <Image Include="assets\skybox\front.png" />
+    <Image Include="assets\skybox\left.png" />
+    <Image Include="assets\skybox\right.png" />
+    <Image Include="assets\skybox\top.png" />
     <Image Include="assets\textures\alien.jpg" />
     <Image Include="assets\textures\alien.png" />
     <Image Include="assets\textures\earth.jpg" />
@@ -229,6 +238,12 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\instanced\box.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\comic.ttf" />
+    <Font Include="assets\fonts\comicbd.ttf" />
+    <Font Include="assets\fonts\comici.ttf" />
+    <Font Include="assets\fonts\comicz.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

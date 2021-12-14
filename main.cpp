@@ -16,6 +16,8 @@
 #include "graphics/models/cube.hpp"
 #include "graphics/models/lamp.hpp"
 #include "graphics/light.h"
+#include "graphics/cubemap.h"
+
 #include "graphics/model.h"
 #include "graphics/models/gun.hpp"
 #include "graphics/models/sphere.hpp"
@@ -80,6 +82,14 @@ int main()
 	Shader shader("assets/instanced/instanced.vs", "assets/object.fs");
 	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
 	Shader textShader("assets/text.vs", "assets/text.fs");
+	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/sky.fs");
+	
+	skyboxShader.activate();
+	skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
+	skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
+	Cubemap skybox;
+	skybox.init();
+	//skybox.loadTexture("assets/skybox");
 	shader.activate();
 	
 	Lamp lamp(4);
@@ -147,10 +157,14 @@ int main()
 		lastFrame = currentTime;
 
 		scene.variableLog["time"] += dt;
-		scene.variableLog["fps"] = 1 / dt;
+		scene.variableLog["fps"] = 1.0f / dt;
+
 		scene.update();
 		proccessInput(dt);
 
+		skyboxShader.activate();
+		skyboxShader.setFloat("time", scene.variableLog["time"].val<float>());
+		skybox.render(skyboxShader, &scene);
 
 		scene.renderText("comic", textShader, "Hello, OpenGL!", 50.0f, 50.0f, glm::vec2(1.0f), glm::vec3(1.0f, 0.0f, 0.2f));
 		scene.renderText("comic", textShader, "Time: " + scene.variableLog["time"].dump(), 50.0f, 1000.0f, glm::vec2(1.0f), glm::vec3(1.0f));
@@ -188,6 +202,7 @@ int main()
 		scene.clearDeadInstances();
 	}
 	g.cleanup();
+	skybox.cleanup();
 	scene.cleanup();
 	return 0;
 }

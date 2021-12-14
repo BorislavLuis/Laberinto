@@ -22,12 +22,13 @@ void Cubemap::loadTexture(std::string _dir,
 
 	for (int i = 0; i < 6; i++)
 	{
-		unsigned char* data = stbi_load((dir + "/" + faces[i]).c_str(), &width, &height, &nChannels, 0);
+		unsigned char* data = stbi_load((_dir + "/" + faces[i]).c_str(), &width, &height, &nChannels, 0);
 		GLenum colorMode = GL_RED;
 		switch (nChannels)
 		{
 			case 3:
 				colorMode = GL_RGB;
+				break;
 			case 4:
 				colorMode = GL_RGBA;
 				break;
@@ -110,12 +111,27 @@ void Cubemap::init()
 	ArrayObject::clear();
 }
 
-void Cubemap::render(Shader shader)
+void Cubemap::render(Shader shader,Scene* scene)
 {
+	glDepthMask(GL_FALSE);
 
+	shader.activate();
+	glm::mat4 view = glm::mat4(glm::mat3(scene->getActiveCamera()->getViewMatrix()));
+	shader.setMat4("view", view);
+	shader.setMat4("projection", scene->projection);
+
+	if (hasTextures)
+	{
+		glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+	}
+	VAO.bind();
+	VAO.draw(GL_TRIANGLES, 0, 36);
+	ArrayObject::clear();
+
+	glDepthMask(GL_TRUE);
 }
 
 void Cubemap::cleanup()
 {
-
+	VAO.cleanup();
 }

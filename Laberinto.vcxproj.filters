@@ -75,6 +75,9 @@
     <ClCompile Include="graphics\text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\cubemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics\shader.h">
@@ -152,6 +155,9 @@
     <ClInclude Include="graphics\text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\cubemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\object.vs" />
@@ -169,6 +175,9 @@
     </None>
     <None Include="assets\text.vs" />
     <None Include="assets\text.fs" />
+    <None Include="assets\skybox\skybox.fs" />
+    <None Include="assets\skybox\skybox.vs" />
+    <None Include="assets\skybox\sky.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">
@@ -207,8 +216,32 @@
     <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_metallicRoughness.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\skybox\back.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\skybox\bottom.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\skybox\front.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\skybox\left.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\skybox\right.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\skybox\top.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\instanced\box.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\comic.ttf" />
+    <Font Include="assets\fonts\comicbd.ttf" />
+    <Font Include="assets\fonts\comici.ttf" />
+    <Font Include="assets\fonts\comicz.ttf" />
   </ItemGroup>
 </Project>

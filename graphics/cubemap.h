@@ -11,6 +11,7 @@
 #include "shader.h"
 #include "glmemory.hpp"
 
+#include "../scene.h"
 class Cubemap
 {
 public:
@@ -25,7 +26,7 @@ public:
 		std::string back = "back.png");
 	
 	void init();
-	void render(Shader shader);
+	void render(Shader shader, Scene* scene);
 	void cleanup();
 private:
 	unsigned int id;
