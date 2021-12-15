@@ -82,14 +82,14 @@ int main()
 	Shader shader("assets/instanced/instanced.vs", "assets/object.fs");
 	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
 	Shader textShader("assets/text.vs", "assets/text.fs");
-	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/sky.fs");
+	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/skybox.fs");
 	
-	skyboxShader.activate();
-	skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
-	skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
+	//skyboxShader.activate();
+	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
+	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
 	Cubemap skybox;
 	skybox.init();
-	//skybox.loadTexture("assets/skybox");
+	skybox.loadTexture("assets/skybox");
 	shader.activate();
 	
 	Lamp lamp(4);
@@ -99,8 +99,11 @@ int main()
 	scene.registerModel(&sphere);
 	//scene.registerModel(&g);
 	//scene.registerModel(&troll);
+	Cube cube(1);
+	scene.registerModel(&cube);
 	Box box;
 	box.init();
+
 
 	scene.loadModels();
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
@@ -140,11 +143,13 @@ int main()
 
 	SpotLight spotLight = {
 		camera.cameraPos,camera.cameraFront,
-		glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(20.0f)),1.0f,0.07f,0.032f,
+		glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(20.0f)),1.0f,0.0014f,0.000007f,
 		glm::vec4(0.0f,0.0f,0.0f,1.0f),glm::vec4(1.0f),glm::vec4(1.0f)};
 	scene.spotLights.push_back(&spotLight);
 	scene.activeSpotLights = 1;
 	
+	scene.generateInstance(cube.id, glm::vec3(20.0f, 0.1f, 20.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
+
 	scene.initInstances();
 	scene.prepare(box);
 
@@ -162,8 +167,8 @@ int main()
 		scene.update();
 		proccessInput(dt);
 
-		skyboxShader.activate();
-		skyboxShader.setFloat("time", scene.variableLog["time"].val<float>());
+		//skyboxShader.activate();
+		//skyboxShader.setFloat("time", scene.variableLog["time"].val<float>());
 		skybox.render(skyboxShader, &scene);
 
 		scene.renderText("comic", textShader, "Hello, OpenGL!", 50.0f, 50.0f, glm::vec2(1.0f), glm::vec3(1.0f, 0.0f, 0.2f));
@@ -178,11 +183,12 @@ int main()
 				scene.markForDeletion(sphere.instances[i]->instanceId);
 			}
 		}
+		scene.renderShader(shader);
 		if (sphere.currentNoInstances > 0)
 		{
-			scene.renderShader(shader);
 			scene.renderInstances(sphere.id, shader, dt);
 		}
+		scene.renderInstances(cube.id, shader, dt);
 		scene.renderShader(lampShader,false);
 		scene.renderInstances(lamp.id, lampShader, dt);
 		//scene.renderShader(gunShader);

@@ -103,6 +103,10 @@ bool Scene::init()
 	}
 
 	FT_Done_FreeType(ft);
+	
+	variableLog["useBlinn"] = true;
+	variableLog["useGamma"] = false;
+
 	return true;
 }
 
@@ -160,6 +164,14 @@ void Scene::processInput(float dt)
 		textProjection = glm::ortho(0.0f, (float)scrWidth, 0.0f, (float)scrHeight);
 		cameraPos = cameras[activeCamera]->cameraPos;
 	}
+		if(Keyboard::keyWentDown(GLFW_KEY_B))
+		{
+			variableLog["useBlinn"] = !variableLog["useBlinn"].val<bool>();
+		}
+		if (Keyboard::keyWentDown(GLFW_KEY_G))
+		{
+			variableLog["useGamma"] = !variableLog["useGamma"].val<bool>();
+		}
 }
 
 void Scene::update()
@@ -212,6 +224,9 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 		}
 		shader.setInt("noSpotLights", noActiveLights);
 		dirLight->render(shader);
+		
+		shader.setBool("useBlinn", variableLog["useBlinn"].val<bool>());
+		shader.setBool("useGamma", variableLog["useGamma"].val<bool>());
 	}
 }
 
