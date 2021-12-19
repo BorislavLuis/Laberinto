@@ -97,6 +97,9 @@ void Mesh::render(Shader shader, unsigned int noInstances)
 			case aiTextureType_SPECULAR:
 				name = "specular" + std::to_string(specularIdx++);
 				break;
+			case aiTextureType_NONE:
+				name = textures[i].name;
+				break;
 			}
 			shader.setInt(name, i);
 			textures[i].bind();

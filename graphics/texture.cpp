@@ -4,6 +4,12 @@
 
 Texture::Texture(){}
 
+Texture::Texture(std::string name)
+	:name(name),type(aiTextureType_NONE)
+{
+	generate();
+}
+
 Texture::Texture(std::string dir, std::string path, aiTextureType type)
 		:dir(dir),path(path),type(type){
 	generate();

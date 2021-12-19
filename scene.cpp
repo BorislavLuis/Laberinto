@@ -85,6 +85,9 @@ bool Scene::init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
 	glfwSetInputMode(window, GLFW_CURSOR,GLFW_CURSOR_DISABLED);
 	
 	octree = new Octree::node(BoundingRegion(glm::vec3(-128.0f), glm::vec3(128.0f)));
@@ -106,6 +109,7 @@ bool Scene::init()
 	
 	variableLog["useBlinn"] = true;
 	variableLog["useGamma"] = false;
+	variableLog["displayOutlines"] = false;
 
 	return true;
 }
@@ -172,12 +176,16 @@ void Scene::processInput(float dt)
 		{
 			variableLog["useGamma"] = !variableLog["useGamma"].val<bool>();
 		}
+		if (Keyboard::keyWentDown(GLFW_KEY_O))
+		{
+			variableLog["displayOutlines"] = !variableLog["displayOutlines"].val<bool>();
+		}
 }
 
 void Scene::update()
 {
 	glClearColor(bg[0], bg[1],bg[2], bg[3]);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Scene::newFrame(Box& box)

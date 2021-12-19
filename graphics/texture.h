@@ -10,7 +10,9 @@
 class Texture
 {
 public:
+
 	Texture();
+	Texture(std::string name);
 	Texture(std::string dir, std::string path, aiTextureType type);;
 
 	void generate();
@@ -20,6 +22,7 @@ public:
 
 	unsigned int id;
 	aiTextureType type;
+	std::string name;
 	std::string dir;
 	std::string path;
 };

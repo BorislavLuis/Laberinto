@@ -17,6 +17,7 @@
 #include "graphics/models/lamp.hpp"
 #include "graphics/light.h"
 #include "graphics/cubemap.h"
+#include "graphics/models/plane.hpp"
 
 #include "graphics/model.h"
 #include "graphics/models/gun.hpp"
@@ -49,7 +50,7 @@ Scene scene;
 Camera camera;
 Keyboard keyboard;
 
-Gun g(1);
+//Gun g(1);
 //Model g("m4a1", BoundTypes::AABB, 1,CONST_INSTANCES);
 //Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
 double dt = 0.0f;
@@ -83,7 +84,9 @@ int main()
 	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
 	Shader textShader("assets/text.vs", "assets/text.fs");
 	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/skybox.fs");
-	
+	Shader outlineShader("assets/outline.vs", "assets/outline.fs");
+	Shader bufferShader("assets/buffer.vs", "assets/buffer.fs");
+
 	//skyboxShader.activate();
 	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
 	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
@@ -99,13 +102,45 @@ int main()
 	scene.registerModel(&sphere);
 	//scene.registerModel(&g);
 	//scene.registerModel(&troll);
-	Cube cube(1);
+	Cube cube(21);
 	scene.registerModel(&cube);
 	Box box;
 	box.init();
 
 
 	scene.loadModels();
+
+	const GLuint BUFFER_WIDTH = 1920, BUFFER_HEIGHT = 1080;
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
+
+	Texture bufferTex("bufferTex");
+	
+	bufferTex.bind();
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, BUFFER_WIDTH, BUFFER_HEIGHT, 0, GL_DEPTH_COMPONENT,GL_FLOAT,NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, bufferTex.id, 0);
+
+	GLuint rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, BUFFER_WIDTH, BUFFER_HEIGHT);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,rbo);
+
+	Plane map;
+	map.init(bufferTex);
+	scene.registerModel(&map);
+
+	glBindBuffer(GL_FRAMEBUFFER, 0);
+
+
 	DirLight dirLight = { glm::vec3(-0.2f,-1.0f,-1.5f),
 			glm::vec4(0.1f,0.1f,0.1f,1.0f),
 			glm::vec4(0.4f,0.4f,0.4f,1.0f),
@@ -148,7 +183,25 @@ int main()
 	scene.spotLights.push_back(&spotLight);
 	scene.activeSpotLights = 1;
 	
+
 	scene.generateInstance(cube.id, glm::vec3(20.0f, 0.1f, 20.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
+	glm::vec3 cubePositions[] = {
+		{ 1.0f, 3.0f, -5.0f },
+		{ -7.25f, 2.1f, 1.5f },
+		{ -15.0f, 2.55f, 9.0f },
+		{ 4.0f, -3.5f, 5.0f },
+		{ 2.8f, 1.9f, -6.2f },
+		{ 3.5f, 6.3f, -1.0f },
+		{ -3.4f, 10.9f, -5.5f },
+		{ 10.0f, -2.0f, 13.2f },
+		{ 2.1f, 7.9f, -8.3f },
+	};
+
+	for (unsigned int i = 0; i < 9; i++) {
+		scene.generateInstance(cube.id, glm::vec3(0.5f), 1.0f, cubePositions[i]);
+	}
+
+	scene.generateInstance(map.id, glm::vec3(2.0f, 2.0f, 0.0f), 0.0f, glm::vec3(0.0f));
 
 	scene.initInstances();
 	scene.prepare(box);
@@ -164,8 +217,14 @@ int main()
 		scene.variableLog["time"] += dt;
 		scene.variableLog["fps"] = 1.0f / dt;
 
+		
+		
 		scene.update();
 		proccessInput(dt);
+
+		glViewport(0, 0, BUFFER_WIDTH, BUFFER_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		//skyboxShader.activate();
 		//skyboxShader.setFloat("time", scene.variableLog["time"].val<float>());
@@ -183,14 +242,45 @@ int main()
 				scene.markForDeletion(sphere.instances[i]->instanceId);
 			}
 		}
+
+		scene.renderShader(lampShader, false);
+		scene.renderInstances(lamp.id, lampShader, dt);
+
+		if (scene.variableLog["displayOutlines"].val<bool>())
+		{
+			glStencilMask(0x00);  
+		}
+
 		scene.renderShader(shader);
 		if (sphere.currentNoInstances > 0)
 		{
 			scene.renderInstances(sphere.id, shader, dt);
 		}
-		scene.renderInstances(cube.id, shader, dt);
-		scene.renderShader(lampShader,false);
-		scene.renderInstances(lamp.id, lampShader, dt);
+
+		//scene.renderInstances(cube.id, shader, dt);
+
+		if (scene.variableLog["displayOutlines"].val<bool>())
+		{
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilMask(0xFF);
+			scene.renderInstances(cube.id, shader, dt);
+
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+			glStencilMask(0x00);
+			glDisable(GL_DEPTH_TEST);
+			scene.renderShader(outlineShader, false);
+			scene.renderInstances(cube.id, outlineShader, dt);
+
+			
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilMask(0xFF);
+			glEnable(GL_DEPTH_TEST);
+		}
+		else
+		{
+			scene.renderInstances(cube.id, shader, dt);
+		}
+		
 		//scene.renderShader(gunShader);
 		//scene.renderInstances(g.id, gunShader, dt);
 
@@ -203,11 +293,16 @@ int main()
 		scene.renderShader(boxShader,false);
 		box.render(boxShader);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, BUFFER_WIDTH, BUFFER_HEIGHT);
+	
+		scene.renderInstances(map.id, bufferShader, dt);
 
 		scene.newFrame(box);
 		scene.clearDeadInstances();
+
 	}
-	g.cleanup();
+	//g.cleanup();
 	skybox.cleanup();
 	scene.cleanup();
 	return 0;

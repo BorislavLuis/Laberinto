@@ -107,6 +107,14 @@ void main()
 		float gamma = 2.2;
 		result.rgb = pow(result.rgb,vec3(1.0/gamma));
 	}
+
+	float near = 0.1;
+	float far = 1000.0;
+	float z = gl_FragCoord.z * 2.0 - 1.0; // transform to NDC [0, 1] => [-1, 1]
+	float linearDepth = (2.0 * near * far) / (z * (far - near) - (far + near)); // take inverse of the projection matrix (perspective)
+	float factor = (near + linearDepth) / (near - far); // convert back to [0, 1]
+
+	result.rgb *= 1 - factor;
 	FragColor = result;
 
 }
