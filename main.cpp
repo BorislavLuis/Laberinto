@@ -224,7 +224,7 @@ int main()
 
 		glViewport(0, 0, BUFFER_WIDTH, BUFFER_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		//skyboxShader.activate();
 		//skyboxShader.setFloat("time", scene.variableLog["time"].val<float>());
@@ -290,12 +290,13 @@ int main()
 		//scene.renderShader(shader);
 		//scene.renderInstances(troll.id, shader, dt);
 
-		scene.renderShader(boxShader,false);
-		box.render(boxShader);
+		//scene.renderShader(boxShader,false);
+		//box.render(boxShader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, BUFFER_WIDTH, BUFFER_HEIGHT);
-	
+		
+		scene.renderShader(bufferShader);
 		scene.renderInstances(map.id, bufferShader, dt);
 
 		scene.newFrame(box);
