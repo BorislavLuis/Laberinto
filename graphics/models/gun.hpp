@@ -33,7 +33,7 @@ public:
 	}
 	void init()
 	{
-		loadModel("assets/textures/models/m4a1/scene.gltf");
+		loadModel("assets/models/m4a1/scene.gltf");
 	}
 };
 

@@ -1,5 +1,5 @@
-#ifndef GLMEMORY_H
-#define GLMEMORY_H
+#ifndef VERTEXMEMORY_H
+#define VERTEXMEMORY_H
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

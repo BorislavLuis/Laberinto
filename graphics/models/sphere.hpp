@@ -12,7 +12,7 @@ public:
 
 	void init() 
 	{ 
-		loadModel("assets/textures/models/sphere/scene.gltf"); 
+		loadModel("assets/models/sphere/scene.gltf"); 
 	}
 };
 

@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp> 
 #include <vector>
-#include "../glmemory.hpp"
+#include "../vertexmemory.hpp"
 #include "../../algorithms/bounds.h"
 #include "../shader.h"
 #define UPPER_BOUND 100

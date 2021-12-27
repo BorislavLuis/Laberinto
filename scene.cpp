@@ -31,12 +31,13 @@ void Scene::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 Scene::Scene():currentId("aaaaaaaa"){}
 
 Scene::Scene(int glfwVersionMajor, int glfwVersionMinor, const char* title, unsigned int scrWidth, unsigned int scrHeight)
-	:glfwVersionMajor(glfwVersionMajor),glfwVersionMinor(glfwVersionMinor),
-	title(title),activeCamera(-1),activePointLights(0),activeSpotLights(0),currentId("aaaaaaaa")
+	: glfwVersionMajor(glfwVersionMajor), glfwVersionMinor(glfwVersionMinor),
+	title(title), activeCamera(-1), activePointLights(0), activeSpotLights(0), currentId("aaaaaaaa")
 {
 	Scene::scrWidth = scrWidth;
 	Scene::scrHeight = scrHeight;
 
+	defaultFBO = FramebufferObject(scrWidth, scrHeight, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	setWindowColor(0.0, 0.8, 0.4, 1.0);
 }
 
@@ -185,7 +186,8 @@ void Scene::processInput(float dt)
 void Scene::update()
 {
 	glClearColor(bg[0], bg[1],bg[2], bg[3]);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	defaultFBO.clear();
 }
 
 void Scene::newFrame(Box& box)
@@ -209,6 +211,10 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 
   	if (applyLighting)
 	{
+		unsigned int textureIdx = 31;
+
+		dirLight->render(shader, textureIdx--);
+
 		unsigned int noLights = pointLights.size();
 		unsigned int noActiveLights = 0;
 		for (unsigned int i = 0; i < noLights; i++)
@@ -231,15 +237,27 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 			}
 		}
 		shader.setInt("noSpotLights", noActiveLights);
-		dirLight->render(shader);
-		
 		shader.setBool("useBlinn", variableLog["useBlinn"].val<bool>());
 		shader.setBool("useGamma", variableLog["useGamma"].val<bool>());
 	}
 }
 
+void Scene::renderDirLightShader(Shader shader)
+{
+	shader.activate();
+	shader.setMat4("lightSpaceMatrix", dirLight->lightSpaceMatrix);
+
+}
+
+void Scene::renderSpotLightShader(Shader shader, unsigned int idx)
+{
+	shader.activate();
+	shader.setMat4("lightSpaceMatrix", spotLights[idx]->lightSpaceMatrix);
+}
+
 void Scene::renderInstances(std::string modelId, Shader shader, float dt)
 {
+	shader.activate();
 	models[modelId]->render(shader, dt, this);
 }
 

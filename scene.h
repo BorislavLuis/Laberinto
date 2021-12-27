@@ -17,6 +17,7 @@
 #include "graphics/model.h"
 #include "graphics/text.h"
 #include "graphics/models/box.hpp"
+#include "graphics/framememory.hpp"
 
 #include "io/camera.h"
 #include "io/keyboard.h"
@@ -47,6 +48,8 @@ public:
 	FT_Library ft;
 	trie::Trie<TextRenderer*> fonts;
 
+	FramebufferObject defaultFBO;
+
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 	Scene();
@@ -59,6 +62,8 @@ public:
 	void update();
 	void newFrame(Box& box);
 	void renderShader(Shader shader, bool applyLighting = true);
+	void renderDirLightShader(Shader shader);
+	void renderSpotLightShader(Shader shader,unsigned int idx);
 	void renderInstances(std::string modelId, Shader shader, float dt);
 	void renderText(std::string font, Shader shader, std::string text, float x, float y, glm::vec2 scale, glm::vec3 color);
 	void cleanup();

@@ -179,7 +179,8 @@
     <ClInclude Include="algorithms\states.hpp" />
     <ClInclude Include="algorithms\trie.hpp" />
     <ClInclude Include="graphics\cubemap.h" />
-    <ClInclude Include="graphics\glmemory.hpp" />
+    <ClInclude Include="graphics\framememory.hpp" />
+    <ClInclude Include="graphics\vertexmemory.hpp" />
     <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />
     <ClInclude Include="graphics\mesh.h" />
@@ -202,24 +203,27 @@
     <ClInclude Include="scene.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\buffer.fs" />
-    <None Include="assets\buffer.vs" />
-    <None Include="assets\outline.fs" />
-    <None Include="assets\outline.vs" />
-    <None Include="assets\instanced\instanced.vs" />
-    <None Include="assets\instanced\box.fs" />
-    <None Include="assets\lamp.fs" />
-    <None Include="assets\object.fs" />
-    <None Include="assets\object.vs" />
+    <None Include="assets\shaders\depth.fs" />
+    <None Include="assets\shaders\buffer.fs" />
+    <None Include="assets\shaders\buffer.vs" />
+    <None Include="assets\shaders\outline.fs" />
+    <None Include="assets\shaders\outline.vs" />
+    <None Include="assets\shaders\instanced\instanced.vs" />
+    <None Include="assets\shaders\instanced\box.fs" />
+    <None Include="assets\shaders\lamp.fs" />
+    <None Include="assets\shaders\object.fs" />
+    <None Include="assets\shaders\object.vs" />
+    <None Include="assets\shaders\shadows\shadow.fs" />
+    <None Include="assets\shaders\shadows\directionalshadow.vs" />
     <None Include="assets\skybox\sky.fs" />
     <None Include="assets\skybox\skybox.fs" />
     <None Include="assets\skybox\skybox.vs" />
-    <None Include="assets\text.fs" />
-    <None Include="assets\text.vs" />
-    <None Include="assets\textures\models\lotr_troll\scene.bin" />
-    <None Include="assets\textures\models\lotr_troll\scene.gltf" />
-    <None Include="assets\textures\models\m4a1\scene.bin" />
-    <None Include="assets\textures\models\m4a1\scene.gltf" />
+    <None Include="assets\shaders\text.fs" />
+    <None Include="assets\shaders\text.vs" />
+    <None Include="assets\models\lotr_troll\scene.bin" />
+    <None Include="assets\models\lotr_troll\scene.gltf" />
+    <None Include="assets\models\m4a1\scene.bin" />
+    <None Include="assets\models\m4a1\scene.gltf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\skybox\back.png" />
@@ -233,16 +237,16 @@
     <Image Include="assets\textures\earth.jpg" />
     <Image Include="assets\textures\earthSpec.jpg" />
     <Image Include="assets\textures\forest1.jpg" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_baseColor.png" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_metallicRoughness.png" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_pants_normal.png" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_baseColor.jpeg" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_emissive.jpeg" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_metallicRoughness.png" />
-    <Image Include="assets\textures\models\lotr_troll\textures\TEX_Troll_normal.png" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_pants_baseColor.png" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_pants_metallicRoughness.png" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_pants_normal.png" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_Troll_baseColor.jpeg" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_Troll_emissive.jpeg" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_Troll_metallicRoughness.png" />
+    <Image Include="assets\models\lotr_troll\textures\TEX_Troll_normal.png" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\instanced\box.vs" />
+    <Text Include="assets\shaders\instanced\box.vs" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\fonts\comic.ttf" />
