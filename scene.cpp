@@ -232,7 +232,7 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 		{
 			if (States::isActive(&activeSpotLights, i))
 			{
-				spotLights[i]->render(shader, noActiveLights);
+				spotLights[i]->render(shader, noActiveLights,textureIdx--);
 				noActiveLights++;
 			}
 		}

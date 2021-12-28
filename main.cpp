@@ -88,7 +88,7 @@ int main()
 	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/skybox.fs");
 	Shader outlineShader("assets/shaders/outline.vs", "assets/shaders/outline.fs");
 	Shader bufferShader("assets/shaders/buffer.vs", "assets/shaders/buffer.fs");
-	Shader dirLightShader("assets/shaders/shadows/directionalshadow.vs", "assets/shaders/shadows/shadow.fs");
+	Shader shadowShader("assets/shaders/shadows/shadow.vs", "assets/shaders/shadows/shadow.fs");
 	//skyboxShader.activate();
 	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
 	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
@@ -117,11 +117,9 @@ int main()
 		glm::vec4(0.7f, 0.7f, 0.7f, 1.0f),
 		BoundingRegion (glm::vec3(-20.0f, -20.0f, 0.5f), glm::vec3(20.0f, 20.0f, 20.0f)));
 
-	Plane map;
-	map.init(dirLight.shadowFBO.textures[0]);
-	scene.registerModel(&map);
-
-
+	//Plane map;
+	//map.init(spotLight.shadowFBO.textures[0]);
+	//scene.registerModel(&map);
 
 	scene.loadModels();
 
@@ -155,14 +153,15 @@ int main()
 	//}
 	////scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f,glm::vec3(2.0f));
 	scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(0.0f, -8.7f, -2.5f));
+	//scene.generateInstance(map.id, glm::vec3(2.0f, 2.0f, 0.0f), 0.0f, glm::vec3(0.0f));
 
-	//SpotLight spotLight = {
-	//	camera.cameraPos,camera.cameraFront,
-	//	glm::cos(glm::radians(12.5f)),glm::cos(glm::radians(20.0f)),1.0f,0.0014f,0.000007f,
-	//	glm::vec4(0.0f,0.0f,0.0f,1.0f),glm::vec4(1.0f),glm::vec4(1.0f)};
-	//scene.spotLights.push_back(&spotLight);
-	//scene.activeSpotLights = 1;
-	
+	SpotLight spotLight(camera.cameraPos, camera.cameraFront, camera.cameraUp,
+		glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(20.0)),
+		1.0f, 0.0014f, 0.000007f,
+		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f),
+		0.1f, 1000.0f);
+	scene.spotLights.push_back(&spotLight);
+	scene.activeSpotLights = 1;
 
 	scene.generateInstance(cube.id, glm::vec3(20.0f, 0.1f, 20.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
 	glm::vec3 cubePositions[] = {
@@ -173,15 +172,14 @@ int main()
 		{ 2.8f, 1.9f, -6.2f },
 		{ 3.5f, 6.3f, -1.0f },
 		{ -3.4f, 10.9f, -5.5f },
-		{ 10.0f, -2.0f, 13.2f },
-		{ 2.1f, 7.9f, -8.3f },
+		{ 0.0f, 11.0f, 0.0f },
+		{ 0.0f, 5.0f, 0.0f },
 	};
 
 	for (unsigned int i = 0; i < 9; i++) {
 		scene.generateInstance(cube.id, glm::vec3(0.5f), 1.0f, cubePositions[i]);
 	}
 
-	scene.generateInstance(map.id, glm::vec3(2.0f, 2.0f, 0.0f), 0.0f, glm::vec3(0.0f));
 
 	scene.initInstances();
 	scene.prepare(box);
@@ -228,7 +226,18 @@ int main()
 			glStencilMask(0x00);  
 		}
 
-		renderScene(dirLightShader);
+		scene.renderDirLightShader(shadowShader);
+		renderScene(shadowShader);
+		
+		for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
+		{
+			if (States::isIndexActive(&scene.activeSpotLights, i))
+			{
+				scene.spotLights[i]->shadowFBO.activate();
+				scene.renderSpotLightShader(shadowShader,i);
+				renderScene(shadowShader);
+			}
+		}
 
 		scene.defaultFBO.activate();
 		scene.renderShader(shader);
@@ -253,7 +262,7 @@ int main()
 		}
 		else
 		{
-			scene.renderInstances(cube.id, dirLightShader, dt);
+			scene.renderInstances(cube.id, shadowShader, dt);
 		}
 		
 		//scene.renderShader(gunShader);
@@ -320,6 +329,8 @@ void proccessInput(double dt)
 	{
 		scene.spotLights[0]->position = scene.getActiveCamera()->cameraPos;
 		scene.spotLights[0]->direction = scene.getActiveCamera()->cameraFront;
+		scene.spotLights[0]->up = scene.getActiveCamera()->cameraUp;
+		scene.spotLights[0]->updateMatrices();
 	}
 	if (Keyboard::key(GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
