@@ -1,7 +1,12 @@
 #include "cubemap.h"
-
+#include "..//scene.h"
 Cubemap::Cubemap()
 	:hasTextures(false) {}
+
+void Cubemap::generate()
+{
+	glGenTextures(1, &id);
+}
 
 void Cubemap::loadTexture(std::string _dir, 
 			std::string right, 
@@ -14,10 +19,7 @@ void Cubemap::loadTexture(std::string _dir,
 	dir = _dir;
 	hasTextures = true;
 	faces = { right,left,top,bottom,front,back };
-	
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-
+	bind();
 	int width, height, nChannels;
 
 	for (int i = 0; i < 6; i++)
@@ -49,6 +51,24 @@ void Cubemap::loadTexture(std::string _dir,
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
+void Cubemap::allocate(GLenum format, GLuint width, GLuint height, GLuint type)
+{
+	hasTextures = true;
+
+	for (unsigned int i = 0; i < 6; i++)
+	{
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+			0, format, width, height, 0, format, type, NULL);
+	}
+	
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
 }
 
 void Cubemap::init()
@@ -111,6 +131,11 @@ void Cubemap::init()
 	ArrayObject::clear();
 }
 
+void Cubemap::bind()
+{
+	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+}
+
 void Cubemap::render(Shader shader,Scene* scene)
 {
 	glDepthMask(GL_FALSE);
@@ -122,7 +147,7 @@ void Cubemap::render(Shader shader,Scene* scene)
 
 	if (hasTextures)
 	{
-		glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+		bind();
 	}
 	VAO.bind();
 	VAO.draw(GL_TRIANGLES, 0, 36);

@@ -221,7 +221,7 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 		{
 			if (States::isActive(&activePointLights, i))
 			{
-				pointLights[i]->render(shader, noActiveLights);
+				pointLights[i]->render(shader, noActiveLights,textureIdx--);
 				noActiveLights++;
 			}
 		}
@@ -247,6 +247,17 @@ void Scene::renderDirLightShader(Shader shader)
 	shader.activate();
 	shader.setMat4("lightSpaceMatrix", dirLight->lightSpaceMatrix);
 
+}
+
+void Scene::renderPointLightShader(Shader shader, unsigned int idx)
+{
+	shader.activate();
+	for (unsigned int i = 0; i < 6; i++)
+	{
+		shader.setMat4("lightSpaceMatrices[" + std::to_string(i) + "]", pointLights[idx]->lightSpaceMatrices[i]);
+	}
+	shader.set3Float("lightPos", pointLights[idx]->position);
+	shader.setFloat("farPlane", pointLights[idx]->farPlane);
 }
 
 void Scene::renderSpotLightShader(Shader shader, unsigned int idx)

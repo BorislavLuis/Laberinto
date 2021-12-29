@@ -60,6 +60,7 @@ double lastFrame = 0.0f;
 
 Sphere sphere(10);
 Cube cube(21);
+Lamp lamp(4);
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
@@ -81,14 +82,18 @@ int main()
 
 	//Shader shader("assets/object.vs", "assets/object.fs");
 	Shader gunShader("assets/shaders/object.vs", "assets/shaders/object.fs");
-	Shader lampShader("assets/shaders/instanced/instanced.vs", "assets/shaders/lamp.fs");
+	//Shader lampShader("assets/shaders/instanced/instanced.vs", "assets/shaders/lamp.fs");
 	Shader shader("assets/shaders/instanced/instanced.vs", "assets/shaders/object.fs");
 	Shader boxShader("assets/shaders/instanced/box.vs", "assets/shaders/instanced/box.fs");
 	Shader textShader("assets/shaders/text.vs", "assets/shaders/text.fs");
 	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/skybox.fs");
-	Shader outlineShader("assets/shaders/outline.vs", "assets/shaders/outline.fs");
-	Shader bufferShader("assets/shaders/buffer.vs", "assets/shaders/buffer.fs");
+	//Shader outlineShader("assets/shaders/outline.vs", "assets/shaders/outline.fs");
+	//Shader bufferShader("assets/shaders/buffer.vs", "assets/shaders/buffer.fs");
 	Shader shadowShader("assets/shaders/shadows/shadow.vs", "assets/shaders/shadows/shadow.fs");
+	Shader pointShadowShader("assets/shaders/shadows/pointShadow.vs",
+		"assets/shaders/shadows/pointShadow.fs",
+		"assets/shaders/shadows/pointShadow.gs");
+
 	//skyboxShader.activate();
 	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
 	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
@@ -97,10 +102,10 @@ int main()
 	skybox.loadTexture("assets/skybox");
 	shader.activate();
 	
-	//Lamp lamp(4);
+
 	//g.loadModel("assets/textures/models/m4a1/scene.gltf");
 	troll.loadModel("assets/models/lotr_troll/scene.gltf");
-	//scene.registerModel(&lamp);
+	scene.registerModel(&lamp);
 	scene.registerModel(&sphere);
 	//scene.registerModel(&g);
 	scene.registerModel(&troll);
@@ -125,7 +130,7 @@ int main()
 
 	scene.dirLight = &dirLight;
 	glm::vec3 pointLightPositions[] = {
-			glm::vec3(0.7f,  0.2f,  2.0f),
+			glm::vec3(0.0f, 15.0f,  0.0f),
 			glm::vec3(2.3f, -3.3f, -4.0f),
 			glm::vec3(-4.0f,  2.0f, -12.0f),
 			glm::vec3(0.0f,  0.0f, -3.0f)
@@ -138,19 +143,20 @@ int main()
 	float k1 = 0.09f;
 	float k2 = 0.032f;
 
-	//PointLight pointLights[4];
+	PointLight pointLights[4];
 
-	//for (unsigned int i = 0; i < 4; i++)
-	//{
-	//	pointLights[i] = {
-	//			pointLightPositions[i],
-	//			k0,k1,k2,
-	//			ambient,diffuse,specular
-	//	};
-	//	scene.generateInstance(lamp.id, glm::vec3(0.25),0.25,pointLightPositions[i]);
-	//	scene.pointLights.push_back(&pointLights[i]);
-	//	States::activate(&scene.activePointLights, i);
-	//}
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		pointLights[i] = PointLight(
+				pointLightPositions[i],
+				k0,k1,k2,
+				ambient,diffuse,specular,
+				0.5f,50.0f
+		);
+		scene.generateInstance(lamp.id, glm::vec3(0.25),0.25,pointLightPositions[i]);
+		scene.pointLights.push_back(&pointLights[i]);
+		States::activate(&scene.activePointLights, i);
+	}
 	////scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f,glm::vec3(2.0f));
 	scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(0.0f, -8.7f, -2.5f));
 	//scene.generateInstance(map.id, glm::vec3(2.0f, 2.0f, 0.0f), 0.0f, glm::vec3(0.0f));
@@ -161,9 +167,9 @@ int main()
 		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f),
 		0.1f, 1000.0f);
 	scene.spotLights.push_back(&spotLight);
-	scene.activeSpotLights = 1;
+	//scene.activeSpotLights = 1;
 
-	scene.generateInstance(cube.id, glm::vec3(20.0f, 0.1f, 20.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
+	scene.generateInstance(cube.id, glm::vec3(1020.0f, 0.1f,1020.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
 	glm::vec3 cubePositions[] = {
 		{ 1.0f, 3.0f, -5.0f },
 		{ -7.25f, 2.1f, 1.5f },
@@ -198,7 +204,7 @@ int main()
 		
 		scene.update();
 		proccessInput(dt);
-	
+		
 		dirLight.shadowFBO.activate();
 
 		//skyboxShader.activate();
@@ -229,41 +235,53 @@ int main()
 		scene.renderDirLightShader(shadowShader);
 		renderScene(shadowShader);
 		
-		for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
+		for (unsigned int i = 0, len = scene.pointLights.size(); i < len; i++)
 		{
-			if (States::isIndexActive(&scene.activeSpotLights, i))
+			if (States::isIndexActive(&scene.activePointLights, i))
 			{
-				scene.spotLights[i]->shadowFBO.activate();
-				scene.renderSpotLightShader(shadowShader,i);
-				renderScene(shadowShader);
+				scene.pointLights[i]->shadowFBO.activate();
+				scene.renderPointLightShader(pointShadowShader, i);
+				renderScene(pointShadowShader);
 			}
 		}
 
+		//for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
+		//{
+		//	if (States::isIndexActive(&scene.activeSpotLights, i))
+		//	{
+		//		scene.spotLights[i]->shadowFBO.activate();
+		//		scene.renderSpotLightShader(shadowShader,i);
+		//		renderScene(shadowShader);
+		//	}
+		//}
+	
 		scene.defaultFBO.activate();
 		scene.renderShader(shader);
+		//skybox.render(skyboxShader, &scene);
 		renderScene(shader);
-		scene.renderInstances(troll.id, shader, dt);
-		if (scene.variableLog["displayOutlines"].val<bool>())
-		{
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilMask(0xFF);
-			scene.renderInstances(cube.id, shader, dt);
+		
+		//scene.renderInstances(troll.id, shader, dt);
+		//if (scene.variableLog["displayOutlines"].val<bool>())
+		//{
+		//	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		//	glStencilMask(0xFF);
+		//	scene.renderInstances(cube.id, shader, dt);
 
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-			glStencilMask(0x00);
-			glDisable(GL_DEPTH_TEST);
-			scene.renderShader(outlineShader, false);
-			scene.renderInstances(cube.id, outlineShader, dt);
+		//	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		//	glStencilMask(0x00);
+		//	glDisable(GL_DEPTH_TEST);
+		//	scene.renderShader(outlineShader, false);
+		//	scene.renderInstances(cube.id, outlineShader, dt);
 
-			
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilMask(0xFF);
-			glEnable(GL_DEPTH_TEST);
-		}
-		else
-		{
-			scene.renderInstances(cube.id, shadowShader, dt);
-		}
+		//	
+		//	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		//	glStencilMask(0xFF);
+		//	glEnable(GL_DEPTH_TEST);
+		//}
+		//else
+		//{
+		//	scene.renderInstances(cube.id, shadowShader, dt);
+		//}
 		
 		//scene.renderShader(gunShader);
 		//scene.renderInstances(g.id, gunShader, dt);
@@ -292,13 +310,13 @@ int main()
 
 void renderScene(Shader shader)
 {
-	scene.renderDirLightShader(shader);
 	if (sphere.currentNoInstances > 0)
 	{
 		scene.renderInstances(sphere.id, shader, dt);
 	}
 	scene.renderInstances(troll.id, shader, dt);
 	scene.renderInstances(cube.id, shader, dt);
+	scene.renderInstances(lamp.id, shader, dt);
 }
 
 void launchItem(float dt)

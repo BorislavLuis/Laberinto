@@ -19,9 +19,9 @@ public:
 	unsigned int id;
 
 	Shader();
-	Shader(const char* vertexShaderPath, const char* fragmentShaderPath);
+	Shader(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath = nullptr);
 
-	void generate(const char* vertexShaderPath, const char* fragmentShaderPath);
+	void generate(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath = nullptr);
 	void activate();
 
 	std::string loadShaderSrc(const char* filename);
