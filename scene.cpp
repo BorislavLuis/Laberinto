@@ -264,6 +264,8 @@ void Scene::renderSpotLightShader(Shader shader, unsigned int idx)
 {
 	shader.activate();
 	shader.setMat4("lightSpaceMatrix", spotLights[idx]->lightSpaceMatrix);
+	shader.set3Float("lightPos", spotLights[idx]->position);
+	shader.setFloat("farPlane", spotLights[idx]->farPlane);
 }
 
 void Scene::renderInstances(std::string modelId, Shader shader, float dt)

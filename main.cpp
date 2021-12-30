@@ -89,9 +89,12 @@ int main()
 	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/skybox.fs");
 	//Shader outlineShader("assets/shaders/outline.vs", "assets/shaders/outline.fs");
 	//Shader bufferShader("assets/shaders/buffer.vs", "assets/shaders/buffer.fs");
-	Shader shadowShader("assets/shaders/shadows/shadow.vs", "assets/shaders/shadows/shadow.fs");
+	Shader dirShadowShader("assets/shaders/shadows/dirSpotShadow.vs",
+		"assets/shaders/shadows/dirShadow.fs");
+	Shader spotShadowShader("assets/shaders/shadows/dirSpotShadow.vs",
+		"assets/shaders/shadows/pointSpotShadow.fs");
 	Shader pointShadowShader("assets/shaders/shadows/pointShadow.vs",
-		"assets/shaders/shadows/pointShadow.fs",
+		"assets/shaders/shadows/pointSpotShadow.fs",
 		"assets/shaders/shadows/pointShadow.gs");
 
 	//skyboxShader.activate();
@@ -232,8 +235,8 @@ int main()
 			glStencilMask(0x00);  
 		}
 
-		scene.renderDirLightShader(shadowShader);
-		renderScene(shadowShader);
+		scene.renderDirLightShader(dirShadowShader);
+		renderScene(dirShadowShader);
 		
 		for (unsigned int i = 0, len = scene.pointLights.size(); i < len; i++)
 		{
@@ -245,15 +248,15 @@ int main()
 			}
 		}
 
-		//for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
-		//{
-		//	if (States::isIndexActive(&scene.activeSpotLights, i))
-		//	{
-		//		scene.spotLights[i]->shadowFBO.activate();
-		//		scene.renderSpotLightShader(shadowShader,i);
-		//		renderScene(shadowShader);
-		//	}
-		//}
+		for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
+		{
+			if (States::isIndexActive(&scene.activeSpotLights, i))
+			{
+				scene.spotLights[i]->shadowFBO.activate();
+				scene.renderSpotLightShader(spotShadowShader,i);
+				renderScene(spotShadowShader);
+			}
+		}
 	
 		scene.defaultFBO.activate();
 		scene.renderShader(shader);

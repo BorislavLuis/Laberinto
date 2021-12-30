@@ -47,6 +47,8 @@ struct DirLight
 	glm::vec4 diffuse;
 	glm::vec4 specular;
 
+	float farPlane;
+
 	BoundingRegion br;
 	glm::mat4 lightSpaceMatrix;
 	FramebufferObject shadowFBO;
