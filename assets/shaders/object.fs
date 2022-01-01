@@ -9,6 +9,7 @@ struct Material
 
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
+uniform sampler2D normal0;
 
 #define MAX_POINT_LIGHTS 20
 struct PointLight
@@ -77,7 +78,9 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform Material material;
-uniform int noTex;
+uniform bool noTex;
+uniform bool noNormalMap;
+uniform bool skipNormalMapping;
 uniform vec3 viewPos;
 uniform bool useBlinn;
 uniform bool useGamma;
@@ -103,13 +106,20 @@ vec3 sampleOffsetDirections[20] = vec3[]
 void main()
 {
 	vec3 norm = normalize(Normal);
+
+	if(!noNormalMap && !skipNormalMapping)
+	{
+		norm = texture(normal0,TexCoord).rgb;
+		norm = normalize(norm*2.0 - 1.0);
+	}
+
 	vec3 viewVec = viewPos - FragPos;
 	vec3 viewDir = normalize(viewVec);
 
 	vec4 diffMap;
 	vec4 specMap;
 
-	if(noTex == 1)
+	if(noTex)
 	{
 		diffMap = material.diffuse;
 		specMap = material.specular;
@@ -121,7 +131,7 @@ void main()
 	}
 	vec4 result = vec4(0.0,0.0,0.0,1.0);
 	
-	result = calcDirLight(norm,viewVec,viewDir,diffMap,specMap);
+	//result = calcDirLight(norm,viewVec,viewDir,diffMap,specMap);
 
 	for(int i =0; i < noPointLights;i++)
 	{
@@ -212,8 +222,8 @@ vec4 calcDirLight(vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap)
 		specular = dirLight.specular * (spec*specMap);
 	}
 
-	float shadow = calcDirLightShadow(norm,viewVec,lightDir);
-
+	//float shadow = calcDirLightShadow(norm,viewVec,lightDir);
+	float shadow = 0.0;
 	return vec4(ambient+(1.0-shadow)*diffuse+specular);
 }
 
@@ -332,8 +342,8 @@ vec4 calcPointLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec
 	diffuse*=attenuation;
 	specular*=attenuation;
 
-	float shadow = calcPointLightShadow(idx,norm,viewVec,lightDir);
-
+	//float shadow = calcPointLightShadow(idx,norm,viewVec,lightDir);
+	float shadow = 0.0;
 	return vec4(ambient+(1.0 - shadow)*(diffuse+specular))*attenuation;
 }
 
@@ -376,8 +386,8 @@ vec4 calcSpotLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4
 		float dist = length(spotLight[idx].position - FragPos);
 		float attenuation = 1.0f/ (spotLight[idx].k0 + spotLight[idx].k1*dist + spotLight[idx].k2*(dist*dist));
 
-		float shadow = calcSpotLightShadow(idx,norm,viewVec,lightDir);
-
+		//float shadow = calcSpotLightShadow(idx,norm,viewVec,lightDir);
+		float shadow = 0.0;
 		return vec4(ambient+(1.0-shadow)*diffuse+specular)*attenuation;
 	}
 	else

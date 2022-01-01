@@ -180,6 +180,7 @@
     <ClInclude Include="algorithms\trie.hpp" />
     <ClInclude Include="graphics\cubemap.h" />
     <ClInclude Include="graphics\framememory.hpp" />
+    <ClInclude Include="graphics\models\brickwall.hpp" />
     <ClInclude Include="graphics\vertexmemory.hpp" />
     <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />
@@ -237,6 +238,9 @@
     <Image Include="assets\skybox\top.png" />
     <Image Include="assets\textures\alien.jpg" />
     <Image Include="assets\textures\alien.png" />
+    <Image Include="assets\textures\brickwall_diffuse.jpg" />
+    <Image Include="assets\textures\brickwall_normal.jpg" />
+    <Image Include="assets\textures\brickwall_specular.jpg" />
     <Image Include="assets\textures\earth.jpg" />
     <Image Include="assets\textures\earthSpec.jpg" />
     <Image Include="assets\textures\forest1.jpg" />

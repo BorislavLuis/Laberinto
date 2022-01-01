@@ -17,12 +17,14 @@
 #include "graphics/models/lamp.hpp"
 #include "graphics/light.h"
 #include "graphics/cubemap.h"
-#include "graphics/models/plane.hpp"
 
 #include "graphics/model.h"
 #include "graphics/models/gun.hpp"
 #include "graphics/models/sphere.hpp"
 #include "graphics/models/box.hpp"
+#include "graphics/models/plane.hpp"
+#include "graphics/models/brickwall.hpp"
+
 #include "graphics/framememory.hpp"
 
 #include "physics/environment.h"
@@ -52,15 +54,18 @@ Scene scene;
 Camera camera;
 Keyboard keyboard;
 
+
 //Gun g(1);
 //Model g("m4a1", BoundTypes::AABB, 1,CONST_INSTANCES);
-Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
+//Model troll("troll", BoundTypes::AABB, 1, CONST_INSTANCES);
 double dt = 0.0f;
 double lastFrame = 0.0f;
 
-Sphere sphere(10);
-Cube cube(21);
+//Sphere sphere(10);
+//Cube cube(21);
 Lamp lamp(4);
+Brickwall wall;
+
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
@@ -107,13 +112,14 @@ int main()
 	
 
 	//g.loadModel("assets/textures/models/m4a1/scene.gltf");
-	troll.loadModel("assets/models/lotr_troll/scene.gltf");
+	//troll.loadModel("assets/models/lotr_troll/scene.gltf");
 	scene.registerModel(&lamp);
-	scene.registerModel(&sphere);
+	scene.registerModel(&wall);
+	//scene.registerModel(&sphere);
 	//scene.registerModel(&g);
-	scene.registerModel(&troll);
-	
-	scene.registerModel(&cube);
+	//scene.registerModel(&troll);
+	//scene.registerModel(&cube);
+
 	Box box;
 	box.init();
 	
@@ -133,8 +139,8 @@ int main()
 
 	scene.dirLight = &dirLight;
 	glm::vec3 pointLightPositions[] = {
+			glm::vec3(1.0f, 1.0f,  0.0f),
 			glm::vec3(0.0f, 15.0f,  0.0f),
-			glm::vec3(2.3f, -3.3f, -4.0f),
 			glm::vec3(-4.0f,  2.0f, -12.0f),
 			glm::vec3(0.0f,  0.0f, -3.0f)
 	};
@@ -143,12 +149,12 @@ int main()
 	glm::vec4 diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
 	glm::vec4 specular = glm::vec4(1.0f);
 	float k0 = 1.0f;
-	float k1 = 0.09f;
-	float k2 = 0.032f;
+	float k1 = 0.0014f;
+	float k2 = 0.000007f;
 
 	PointLight pointLights[4];
 
-	for (unsigned int i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 1; i++)
 	{
 		pointLights[i] = PointLight(
 				pointLightPositions[i],
@@ -161,7 +167,7 @@ int main()
 		States::activate(&scene.activePointLights, i);
 	}
 	////scene.generateInstance(g.id, glm::vec3(0.01f), 0.25f,glm::vec3(2.0f));
-	scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(0.0f, -8.7f, -2.5f));
+	//scene.generateInstance(troll.id, glm::vec3(0.010f), 0.25f, glm::vec3(0.0f, -8.7f, -2.5f));
 	//scene.generateInstance(map.id, glm::vec3(2.0f, 2.0f, 0.0f), 0.0f, glm::vec3(0.0f));
 
 	SpotLight spotLight(camera.cameraPos, camera.cameraFront, camera.cameraUp,
@@ -172,7 +178,7 @@ int main()
 	scene.spotLights.push_back(&spotLight);
 	//scene.activeSpotLights = 1;
 
-	scene.generateInstance(cube.id, glm::vec3(1020.0f, 0.1f,1020.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
+	//scene.generateInstance(cube.id, glm::vec3(1020.0f, 0.1f,1020.0f), 100.0f, glm::vec3(0.0f, -10.0f, 0.0f));
 	glm::vec3 cubePositions[] = {
 		{ 1.0f, 3.0f, -5.0f },
 		{ -7.25f, 2.1f, 1.5f },
@@ -186,15 +192,17 @@ int main()
 	};
 
 	for (unsigned int i = 0; i < 9; i++) {
-		scene.generateInstance(cube.id, glm::vec3(0.5f), 1.0f, cubePositions[i]);
+		//scene.generateInstance(cube.id, glm::vec3(0.5f), 1.0f, cubePositions[i]);
 	}
 
-
+	scene.generateInstance(wall.id, glm::vec3(1.0f), 1.0f, glm::vec3(0.0f, 0.0f, -2.0f));
 	scene.initInstances();
 	scene.prepare(box);
 
 	scene.variableLog["time"] = (double)0.0;
 	scene.defaultFBO.bind();
+	shader.activate();
+	shader.setBool("skipNormalMapping", false);
 
 	while (!scene.shouldClose())
 	{
@@ -219,44 +227,44 @@ int main()
 		//scene.renderText("comic", textShader, "FPS: " + scene.variableLog["fps"].dump(), 50.0f, 1000.0f - 40.0f, glm::vec2(1.0f), glm::vec3(1.0f));
 
 
-		for (int i = 0; i < sphere.currentNoInstances; i++)
-		{
-			if (glm::length(camera.cameraPos - sphere.instances[i]->pos) > 250.0f)
-			{
-				scene.markForDeletion(sphere.instances[i]->instanceId);
-			}
-		}
+		//for (int i = 0; i < sphere.currentNoInstances; i++)
+		//{
+		//	if (glm::length(camera.cameraPos - sphere.instances[i]->pos) > 250.0f)
+		//	{
+		//		scene.markForDeletion(sphere.instances[i]->instanceId);
+		//	}
+		//}
 
 		//scene.renderShader(lampShader, false);
 		//scene.renderInstances(lamp.id, lampShader, dt);
 	
-		if (scene.variableLog["displayOutlines"].val<bool>())
-		{
-			glStencilMask(0x00);  
-		}
+		//if (scene.variableLog["displayOutlines"].val<bool>())
+		//{
+		//	glStencilMask(0x00);  
+		//}
 
-		scene.renderDirLightShader(dirShadowShader);
-		renderScene(dirShadowShader);
+		//scene.renderDirLightShader(dirShadowShader);
+		//renderScene(dirShadowShader);
 		
-		for (unsigned int i = 0, len = scene.pointLights.size(); i < len; i++)
-		{
-			if (States::isIndexActive(&scene.activePointLights, i))
-			{
-				scene.pointLights[i]->shadowFBO.activate();
-				scene.renderPointLightShader(pointShadowShader, i);
-				renderScene(pointShadowShader);
-			}
-		}
+		//for (unsigned int i = 0, len = scene.pointLights.size(); i < len; i++)
+		//{
+		//	if (States::isIndexActive(&scene.activePointLights, i))
+		//	{
+		//		scene.pointLights[i]->shadowFBO.activate();
+		//		scene.renderPointLightShader(pointShadowShader, i);
+		//		renderScene(pointShadowShader);
+		//	}
+		//}
 
-		for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
-		{
-			if (States::isIndexActive(&scene.activeSpotLights, i))
-			{
-				scene.spotLights[i]->shadowFBO.activate();
-				scene.renderSpotLightShader(spotShadowShader,i);
-				renderScene(spotShadowShader);
-			}
-		}
+		//for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
+		//{
+		//	if (States::isIndexActive(&scene.activeSpotLights, i))
+		//	{
+		//		scene.spotLights[i]->shadowFBO.activate();
+		//		scene.renderSpotLightShader(spotShadowShader,i);
+		//		renderScene(spotShadowShader);
+		//	}
+		//}
 	
 		scene.defaultFBO.activate();
 		scene.renderShader(shader);
@@ -313,25 +321,26 @@ int main()
 
 void renderScene(Shader shader)
 {
-	if (sphere.currentNoInstances > 0)
-	{
-		scene.renderInstances(sphere.id, shader, dt);
-	}
-	scene.renderInstances(troll.id, shader, dt);
-	scene.renderInstances(cube.id, shader, dt);
+	//if (sphere.currentNoInstances > 0)
+	//{
+	//	scene.renderInstances(sphere.id, shader, dt);
+	//}
+	//scene.renderInstances(troll.id, shader, dt);
+	//scene.renderInstances(cube.id, shader, dt);
 	scene.renderInstances(lamp.id, shader, dt);
+	scene.renderInstances(wall.id, shader, dt);
 }
 
 void launchItem(float dt)
 {
 	
 	//RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f),1.0f, g.rb.pos);
-	RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f), 1.0f,scene.cameras[scene.activeCamera]->cameraPos);
-	if (rb)
-	{
-		rb->transferEnergy(10.0f, camera.cameraFront);
-		rb->applyAcceleration(Environment::gravitationalAcceleration);
-	}
+	//RigidBody* rb = scene.generateInstance(sphere.id, glm::vec3(1.0f), 1.0f,scene.cameras[scene.activeCamera]->cameraPos);
+	//if (rb)
+	//{
+	//	rb->transferEnergy(10.0f, camera.cameraFront);
+	//	rb->applyAcceleration(Environment::gravitationalAcceleration);
+	//}
 	//float x = Camera::defaultCamera.cameraFront.x;
 	//float z = Camera::defaultCamera.cameraFront.z;
 	//float xz = x / z;

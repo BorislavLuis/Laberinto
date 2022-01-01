@@ -111,6 +111,7 @@ bool Scene::init()
 	variableLog["useBlinn"] = true;
 	variableLog["useGamma"] = false;
 	variableLog["displayOutlines"] = false;
+	variableLog["skipNormalMapping"] = false;
 
 	return true;
 }
@@ -181,6 +182,10 @@ void Scene::processInput(float dt)
 		{
 			variableLog["displayOutlines"] = !variableLog["displayOutlines"].val<bool>();
 		}
+		if (Keyboard::keyWentDown(GLFW_KEY_N))
+		{
+			variableLog["skipNormalMapping"] = !variableLog["skipNormalMapping"].val<bool>();
+		}
 }
 
 void Scene::update()
@@ -239,6 +244,7 @@ void Scene::renderShader(Shader shader, bool applyLighting)
 		shader.setInt("noSpotLights", noActiveLights);
 		shader.setBool("useBlinn", variableLog["useBlinn"].val<bool>());
 		shader.setBool("useGamma", variableLog["useGamma"].val<bool>());
+		shader.setBool("skipNormalMapping", variableLog["skipNormalMapping"].val<bool>());
 	}
 }
 

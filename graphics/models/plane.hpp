@@ -9,7 +9,7 @@ public:
 	Plane()
 		:Model("plane", BoundTypes::AABB, 1, CONST_INSTANCES){}
 
-	void init(Texture tex)
+	void init(std::vector<Texture> tex)
 	{
 		int noVertices = 4;
 		float quadVertices[] = {
@@ -25,7 +25,7 @@ public:
 
 		BoundingRegion br(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.5f, 0.5f, 0.0f));
 
-		Mesh ret(br, { tex });
+		Mesh ret(br, tex);
 		ret.loadData(Vertex::genList(quadVertices, noVertices), indices,true);
 
 		meshes.push_back(ret);
