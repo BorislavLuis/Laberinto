@@ -5,15 +5,17 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <string>
+//#include <iostream>
 #include "vertexmemory.hpp"
+#include "shader.h"
 
 #define N 4
 namespace UBO
 {
 	enum class Type : unsigned char
 	{
-		BOOL = 0,
-		SCALAR,
+	
+		SCALAR = 0,
 		VEC2,
 		VEC3,
 		VEC4,
@@ -22,10 +24,24 @@ namespace UBO
 		INVALID
 	};
 
+	unsigned int roundUpPow2(unsigned int val, unsigned char n)
+	{
+		unsigned int pow2n = 0b1 << n;
+		unsigned int divisor = pow2n - 1;
+
+		unsigned int rem = val & divisor;
+		if (rem)
+		{
+			val += pow2n - rem;
+		}
+		return val;
+	}
+
 
 	typedef struct Element
 	{
 		Type type;
+		unsigned int baseAlign;
 		unsigned int length;
 		std::vector<Element> list;
 
@@ -33,7 +49,6 @@ namespace UBO
 		{
 			switch (type)
 			{
-			case Type::BOOL: return "bool";
 			case Type::SCALAR: return "scalar";
 			case Type::VEC2: return "vec2";
 			case Type::VEC3: return "vec3";
@@ -43,9 +58,77 @@ namespace UBO
 			default: return "invalid";
 			}
 		}
+		
+		unsigned int alignPow2()
+		{
+			switch (baseAlign)
+			{
+			case 2: return 1;
+			case 4: return 2;
+			case 8: return 3;
+			case 16: return 4;
+			default: return 0;
+			}
+		}
 
+		unsigned int calcSize()
+		{
+			switch (type)
+			{
+			case Type::SCALAR: return N;
+			case Type::VEC2: return 2 * N;
+			case Type::VEC3: return 3 * N;
+			case Type::VEC4: return 4 * N;
+			case Type::ARRAY:
+			case Type::STRUCT:
+				return calcPaddedSize();
+			default: return 0;
+
+			}
+		}
+		unsigned int calcPaddedSize()
+		{
+			unsigned int offset = 0;
+			switch (type)
+			{
+			case Type::ARRAY:
+				return length * roundUpPow2(list[0].calcPaddedSize(), alignPow2());
+			case Type::STRUCT:
+				for (Element e : list)
+				{
+					offset = roundUpPow2(offset, e.alignPow2());
+					offset += e.calcSize();
+				}
+				return offset;
+			case Type::SCALAR:
+			case Type::VEC2:
+			case Type::VEC3:
+			case Type::VEC4:
+			default: return calcSize();
+
+			}
+		}
 		Element(Type type = Type::SCALAR)
-			:type(type), length(0),list(0){}
+			:type(type), length(0),list(0)
+		{
+			switch (type)
+			{
+			case Type::SCALAR:
+				baseAlign = N;
+				break;
+			case Type::VEC2:
+				baseAlign = 2 * N;
+				break;
+			case Type::VEC3:
+			case Type::VEC4:
+				baseAlign = 4 * N;
+				break;
+			default:
+				baseAlign = 0;
+				break;
+			}
+		}
+
 
 	}Element;
 
@@ -72,6 +155,9 @@ namespace UBO
 		ret.list = { arrElement };
 		ret.list.shrink_to_fit();
 
+		ret.baseAlign = arrElement.type == Type::STRUCT ?
+			arrElement.baseAlign :
+			roundUpPow2(arrElement.baseAlign, 4);
 		return ret;
 	}
 
@@ -99,6 +185,18 @@ namespace UBO
 		ret.list.insert(ret.list.end(), subelements.begin(), subelements.end());
 		ret.length = ret.list.size();
 
+		if (subelements.size())
+		{
+			for (Element e : subelements)
+			{
+				if (e.baseAlign > ret.baseAlign)
+				{
+					ret.baseAlign = e.baseAlign;
+				}
+			}
+			ret.baseAlign = roundUpPow2(ret.baseAlign, 4);
+		}
+
 		return ret;
 	}
 
@@ -106,25 +204,69 @@ namespace UBO
 	{
 	public:
 		Element block;
+		unsigned int calculatedSize;
+		GLuint bindingPos;
 
-		UBO()
-			:BufferObject(GL_UNIFORM_BUFFER), block(newStruct({})) {}
+		UBO(GLuint bindingPos)
+			:BufferObject(GL_UNIFORM_BUFFER), block(newStruct({})),
+			calculatedSize(0),
+			bindingPos(bindingPos){}
 
-		UBO(std::vector<Element> elements)
-			:BufferObject(GL_UNIFORM_BUFFER), block(newStruct(elements)) {}
+		UBO(GLuint bindingPos,std::vector<Element> elements)
+			:BufferObject(GL_UNIFORM_BUFFER), block(newStruct(elements)),
+			calculatedSize(0),
+			bindingPos(bindingPos){}
+
+		void attachToShader(Shader shader, std::string name)
+		{
+			GLuint blockIdx = glGetUniformBlockIndex(shader.id, name.c_str());
+			glUniformBlockBinding(shader.id, blockIdx, bindingPos);
+		}
+
+		void initNullData(GLenum usage)
+		{
+			if (!calculatedSize)
+			{
+				calculatedSize = calcSize();
+			}
+			glBufferData(type, calculatedSize, NULL, usage);
+		}
+
+		void bindRange(GLuint offset = 0)
+		{
+			if (!calculatedSize)
+			{
+				calculatedSize = calcSize();
+			}
+			glBindBufferRange(type, bindingPos, val, offset, calculatedSize);
+		}
+
+		unsigned int calcSize()
+		{
+			return block.calcPaddedSize();
+		}
 
 		void addElement(Element element)
 		{
 			block.list.push_back(element);
+			if (element.baseAlign > block.baseAlign)
+			{
+				block.baseAlign = element.baseAlign;
+			}
 			block.length++;
 		}
 
+
+		GLuint offset;
+		GLuint poppedOffset;
 		std::vector<std::pair<unsigned int, Element*>> indexStack;
 		int currentDepth;
 
 		void startWrtie()
 		{
 			currentDepth = 0;
+			offset = 0;
+			poppedOffset = 0;
 			indexStack.clear();
 			indexStack.push_back({ 0,&block });
 		}
@@ -168,7 +310,135 @@ namespace UBO
 				}
 			}
 
+			poppedOffset = roundUpPow2(offset, currentElement->alignPow2())+currentElement->calcSize();
+			if (!pop())
+			{
+				poppedOffset = 0;
+			}
 			return *currentElement;
+		}
+
+		bool pop()
+		{
+			bool popped = false;
+
+			for (int i = currentDepth; i >= 0; i--)
+			{
+				int advanceIdx = ++indexStack[i].first;
+				if (advanceIdx >= indexStack[i].second->length)
+				{
+					poppedOffset = roundUpPow2(poppedOffset, indexStack[i].second->alignPow2());
+					indexStack.erase(indexStack.begin() + i);
+					popped = true;
+					currentDepth--;
+				}
+				else
+				{
+					break;
+				}
+			}
+			return popped;
+		}
+		
+		template <typename T>
+		void writeElement(T* data)
+		{
+			Element element = getNextElement();
+			//std::cout << element.typeStr() << "--" << element.baseAlign << "--" << offset << "--";
+			offset = roundUpPow2(offset, element.alignPow2());
+			//std::cout << offset << std::endl;
+			glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(T), data);
+
+			if (poppedOffset)
+			{
+				offset = poppedOffset;
+			}
+			else
+			{
+				offset += element.calcSize();
+			}
+		}
+
+		template<typename T>
+		void writeArray(T* first,unsigned int n)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				writeElement<T>(&first[i]);
+			}
+		}
+
+		template<typename T,typename V>
+		void writeArrayContainer(T* container, unsigned int n)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				writeElement<V>(&container->operator[](i));
+			}
+		}
+
+		void advanceCursor(unsigned int n)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				Element element = getNextElement();
+				offset = roundUpPow2(offset, element.alignPow2());
+				if (poppedOffset)
+				{
+					offset = poppedOffset;
+				}
+				else
+				{
+					offset += element.calcSize();
+				}
+			}
+		}
+
+		void advanceArray(unsigned int noElements)
+		{
+			if (currentDepth < 0)
+			{
+				return;
+			}
+			Element* currentElement = indexStack[currentDepth].second;
+
+			if (currentElement->type == Type::STRUCT)
+			{
+				currentElement = &currentElement->list[indexStack[currentDepth].first];
+				unsigned int depthAddition = 0;
+				std::vector<std::pair<unsigned int, Element*>> stackAddition;
+				
+				while (currentElement->type == Type::STRUCT)
+				{
+					depthAddition++;
+					stackAddition.push_back({ 0,currentElement });
+					currentElement = &currentElement->list[0];
+				}
+
+				if (currentElement->type != Type::ARRAY)
+				{
+					return;
+				}
+
+				currentDepth += depthAddition + 1;
+				indexStack.insert(indexStack.end(), stackAddition.begin(), stackAddition.end());
+				indexStack.push_back({ 0,currentElement });
+
+			}
+			unsigned int finalIdx = indexStack[currentDepth].first + noElements;
+			unsigned int advanceCount = noElements;
+			if (finalIdx >= indexStack[currentDepth].second->length)
+			{
+				advanceCount = indexStack[currentDepth].second->length - indexStack[currentDepth].first;
+			}
+
+			offset += advanceCount * roundUpPow2(currentElement->list[0].calcSize(), currentElement->alignPow2());
+			
+			poppedOffset = offset;
+			if (pop())
+			{
+				offset = poppedOffset;
+			}
 		}
 	};
 };

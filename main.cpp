@@ -67,6 +67,11 @@ double lastFrame = 0.0f;
 Lamp lamp(4);
 Brickwall wall;
 std::string Shader::defaultDirectory = "assets/shaders";
+
+struct Color
+{
+	glm::vec3 c;
+};
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
@@ -76,30 +81,6 @@ int main()
 	std::cout << vec.x << " " << vec.y << " " << vec.z << " " << std::endl;
 	std::cout << "Hello world" << std::endl;
 
-	UBO::UBO ubo({
-		UBO::Type::SCALAR,
-		UBO::newStruct({
-			UBO::newArray(5,UBO::Type::SCALAR),
-			UBO::Type::SCALAR,
-			UBO::newArray(2,UBO::newVec(3))
-			}),
-		UBO::newArray(2,UBO::newStruct({
-			UBO::newColMat(4,4),
-			UBO::newVec(3)
-			}))
-		});
-	ubo.startWrtie();
-	while (true)
-	{
-		UBO::Element e = ubo.getNextElement();
-		if (e.type == UBO::Type::INVALID)
-		{
-			break;
-		}
-		std::cout << e.typeStr() << std::endl;
-	}
-
-	return 0;
 	scene = Scene(3, 3, "Laberinto", 1920, 1080);
 	if (!scene.init())
 	{
@@ -127,6 +108,35 @@ int main()
 		"shadows/pointSpotShadow.fs",
 		"shadows/pointShadow.gs");
 	Shader::clearDefaults();
+
+	UBO::UBO ubo(0, {
+		UBO::newColMatArray(3,4,4)
+		});
+
+	ubo.attachToShader(shader, "Colors");
+	ubo.generate();
+	ubo.bind();
+	ubo.initNullData(GL_STATIC_DRAW);
+	ubo.clear();
+
+	ubo.bindRange();
+	ubo.startWrtie();
+
+	Color colorArray[3] =
+	{
+		{{1.0f,0.0f,0.0f}},
+		{{0.0f,1.0f,0.0f} },
+		{{0.0f,0.0f,1.0f}}
+	};
+
+	float fArr[3] = { 0.0f,0.0f,0.0f };
+	ubo.bind();
+	ubo.advanceArray(2 * 4);
+
+	glm::mat4 m = glm::translate(glm::mat4(1.0f), { 3.0f,0.0f,-5.0f });
+	ubo.writeArrayContainer < glm::mat4, glm::vec4>(&m, 4);
+	ubo.clear();
+
 	//skyboxShader.activate();
 	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
 	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);

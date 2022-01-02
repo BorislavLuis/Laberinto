@@ -1,4 +1,3 @@
-
 struct Material
 {
 	vec4 diffuse;
@@ -10,13 +9,12 @@ uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 uniform sampler2D normal0;
 
-#define MAX_POINT_LIGHTS 20
 uniform PointLight pointLight[MAX_POINT_LIGHTS];
 uniform int noPointLights;
 
 uniform DirLight dirLight;
 
-#define MAX_SPOT_LIGHTS 5
+
 uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
 uniform int noSpotLights;
 
@@ -54,6 +52,7 @@ vec3 sampleOffsetDirections[20] = vec3[]
    vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
    vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  0, 0 )
 );   
+
 
 void main()
 {
@@ -107,8 +106,8 @@ void main()
 
 	result.rgb *= 1 - factor;
 	FragColor = result;
-
 }
+
 float calcDirLightShadow(vec3 norm,vec3 viewVec,vec3 lightDir)
 {
 	vec4 fragPosLightSpace = dirLight.lightSpaceMatrix*vec4(fs_in.FragPos,1.0);
