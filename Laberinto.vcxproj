@@ -181,6 +181,7 @@
     <ClInclude Include="graphics\cubemap.h" />
     <ClInclude Include="graphics\framememory.hpp" />
     <ClInclude Include="graphics\models\brickwall.hpp" />
+    <ClInclude Include="graphics\uniformmemory.hpp" />
     <ClInclude Include="graphics\vertexmemory.hpp" />
     <ClInclude Include="graphics\light.h" />
     <ClInclude Include="graphics\material.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\defaultHead.gh" />
     <None Include="assets\shaders\depth.fs" />
     <None Include="assets\shaders\buffer.fs" />
     <None Include="assets\shaders\buffer.vs" />
@@ -219,9 +221,10 @@
     <None Include="assets\shaders\shadows\pointShadow.vs" />
     <None Include="assets\shaders\shadows\dirShadow.fs" />
     <None Include="assets\shaders\shadows\dirSpotShadow.vs" />
-    <None Include="assets\skybox\sky.fs" />
-    <None Include="assets\skybox\skybox.fs" />
-    <None Include="assets\skybox\skybox.vs" />
+    <None Include="assets\shaders\sky.fs" />
+    <None Include="assets\shaders\skybox.fs" />
+    <None Include="assets\shaders\skybox.vs" />
+    <None Include="assets\shaders\test.vs" />
     <None Include="assets\shaders\text.fs" />
     <None Include="assets\shaders\text.vs" />
     <None Include="assets\models\lotr_troll\scene.bin" />

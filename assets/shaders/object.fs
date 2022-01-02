@@ -1,4 +1,3 @@
-#version 330 core
 
 struct Material
 {
@@ -12,68 +11,21 @@ uniform sampler2D specular0;
 uniform sampler2D normal0;
 
 #define MAX_POINT_LIGHTS 20
-struct PointLight
-{
-	vec3 position;
-
-	float k0;
-	float k1;
-	float k2;
-
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
-
-	float farPlane;
-	samplerCube depthBuffer;
-};
 uniform PointLight pointLight[MAX_POINT_LIGHTS];
 uniform int noPointLights;
 
-struct DirLight
-{
-	vec3 direction;
-
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
-
-	float farPlane;
-
-	sampler2D depthBuffer;
-	mat4 lightSpaceMatrix;
-};
 uniform DirLight dirLight;
 
 #define MAX_SPOT_LIGHTS 5
-struct SpotLight
-{
-	vec3 position;
-	vec3 direction;
-
-	float cutOff;
-	float outerCutOff;
-
-	float k0;
-	float k1;
-	float k2;
-
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
-
-	float nearPlane;
-	float farPlane;
-
-	sampler2D depthBuffer;
-	mat4 lightSpaceMatrix;
-};
 uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
 uniform int noSpotLights;
 
-in vec3 FragPos;
-in vec3 Normal;
-in vec2 TexCoord;
+in VS_OUT
+{
+	vec3 FragPos;
+	vec3 Normal;
+	vec2 Tex_Coord;
+}fs_in;
 
 out vec4 FragColor;
 
@@ -105,15 +57,15 @@ vec3 sampleOffsetDirections[20] = vec3[]
 
 void main()
 {
-	vec3 norm = normalize(Normal);
+	vec3 norm = normalize(fs_in.Normal);
 
 	if(!noNormalMap && !skipNormalMapping)
 	{
-		norm = texture(normal0,TexCoord).rgb;
+		norm = texture(normal0,fs_in.Tex_Coord).rgb;
 		norm = normalize(norm*2.0 - 1.0);
 	}
 
-	vec3 viewVec = viewPos - FragPos;
+	vec3 viewVec = viewPos - fs_in.FragPos;
 	vec3 viewDir = normalize(viewVec);
 
 	vec4 diffMap;
@@ -126,8 +78,8 @@ void main()
 	}
 	else
 	{
-		diffMap = texture(diffuse0,TexCoord);
-		specMap = texture(specular0,TexCoord);
+		diffMap = texture(diffuse0,fs_in.Tex_Coord);
+		specMap = texture(specular0,fs_in.Tex_Coord);
 	}
 	vec4 result = vec4(0.0,0.0,0.0,1.0);
 	
@@ -159,7 +111,7 @@ void main()
 }
 float calcDirLightShadow(vec3 norm,vec3 viewVec,vec3 lightDir)
 {
-	vec4 fragPosLightSpace = dirLight.lightSpaceMatrix*vec4(FragPos,1.0);
+	vec4 fragPosLightSpace = dirLight.lightSpaceMatrix*vec4(fs_in.FragPos,1.0);
 
 	vec3 projCoords = fragPosLightSpace.xyz/fragPosLightSpace.w;
 
@@ -199,7 +151,7 @@ vec4 calcDirLight(vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap)
 {
 	vec4 ambient = dirLight.ambient*diffMap;
 	
-	vec3 lightDir = normalize(-dirLight.direction - FragPos);
+	vec3 lightDir = normalize(-dirLight.direction - fs_in.FragPos);
 	float diff = max(dot(norm,lightDir),0.0);
 	vec4 diffuse = dirLight.diffuse * (diff * diffMap);
 
@@ -229,7 +181,7 @@ vec4 calcDirLight(vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap)
 
 float calcSpotLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir)
 {
-	vec4 fragPosLightSpace = spotLight[idx].lightSpaceMatrix * vec4(FragPos,1.0);
+	vec4 fragPosLightSpace = spotLight[idx].lightSpaceMatrix * vec4(fs_in.FragPos,1.0);
 
 	vec3 projCoords = fragPosLightSpace.xyz/fragPosLightSpace.w;
 
@@ -275,7 +227,7 @@ float calcSpotLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir)
 
 float calcPointLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir)
 {
-	vec3 lightToFrag = FragPos - pointLight[idx].position;
+	vec3 lightToFrag = fs_in.FragPos - pointLight[idx].position;
 
 	float closestDepth = texture(pointLight[idx].depthBuffer,lightToFrag).r;
 
@@ -312,7 +264,7 @@ vec4 calcPointLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec
 {
 	vec4 ambient = pointLight[idx].ambient*diffMap;
 	
-	vec3 lightDir = normalize(pointLight[idx].position - FragPos);
+	vec3 lightDir = normalize(pointLight[idx].position - fs_in.FragPos);
 	float diff = max(dot(norm,lightDir),0.0);
 	vec4 diffuse = pointLight[idx].diffuse * (diff * diffMap);
 
@@ -335,7 +287,7 @@ vec4 calcPointLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec
 		specular = dirLight.specular * (spec*specMap);
 	}
 
-	float dist = length(pointLight[idx].position - FragPos);
+	float dist = length(pointLight[idx].position - fs_in.FragPos);
 	float attenuation = 1.0f/ (pointLight[idx].k0 + pointLight[idx].k1*dist + pointLight[idx].k2*(dist*dist));
 
 	ambient*=attenuation;
@@ -349,7 +301,7 @@ vec4 calcPointLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec
 
 vec4 calcSpotLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap)
 {
-	vec3 lightDir =normalize(spotLight[idx].position -FragPos);
+	vec3 lightDir =normalize(spotLight[idx].position -fs_in.FragPos);
 	float theta = dot(lightDir,normalize(-spotLight[idx].direction));
 
 	vec4 ambient = spotLight[idx].ambient *diffMap;
@@ -383,7 +335,7 @@ vec4 calcSpotLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4
 		diffuse *= intesity;
 		specular *= intesity;
 
-		float dist = length(spotLight[idx].position - FragPos);
+		float dist = length(spotLight[idx].position - fs_in.FragPos);
 		float attenuation = 1.0f/ (spotLight[idx].k0 + spotLight[idx].k1*dist + spotLight[idx].k2*(dist*dist));
 
 		//float shadow = calcSpotLightShadow(idx,norm,viewVec,lightDir);

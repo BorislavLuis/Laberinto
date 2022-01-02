@@ -19,13 +19,13 @@ public:
 	unsigned int id;
 
 	Shader();
-	Shader(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath = nullptr);
+	Shader(bool includeDefaultHeader,const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath = nullptr);
 
-	void generate(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath = nullptr);
+	void generate(bool includeDefaultHeader, const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath = nullptr);
 	void activate();
 
-	std::string loadShaderSrc(const char* filename);
-	GLuint compileShader(const char* filepath, GLenum type);
+
+	GLuint compileShader(bool includeDefaultHeader,const char* filepath, GLenum type);
 
 	void setMat4(const std::string& name, glm::mat4 val);
 	void setInt(const std::string& name, int val);
@@ -36,5 +36,10 @@ public:
 	void set4Float(const std::string& name, aiColor4D color);
 	void set4Float(const std::string& name, glm::vec4 v);
 
+	static std::string defaultDirectory;
+	static std::stringstream defaultHeaders;
+	static void loadIntoDefault(const char* filepath);
+	static void clearDefaults();
+	static std::string loadShaderSrc(bool includeDefaultHeader, const char* filename);
 };
 #endif

@@ -167,6 +167,9 @@
     <ClInclude Include="graphics\models\brickwall.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\uniformmemory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\object.vs" />
@@ -184,9 +187,9 @@
     </None>
     <None Include="assets\shaders\text.vs" />
     <None Include="assets\shaders\text.fs" />
-    <None Include="assets\skybox\skybox.fs" />
-    <None Include="assets\skybox\skybox.vs" />
-    <None Include="assets\skybox\sky.fs" />
+    <None Include="assets\shaders\skybox.fs" />
+    <None Include="assets\shaders\skybox.vs" />
+    <None Include="assets\shaders\sky.fs" />
     <None Include="assets\shaders\outline.fs" />
     <None Include="assets\shaders\outline.vs" />
     <None Include="assets\shaders\buffer.fs" />
@@ -197,6 +200,8 @@
     <None Include="assets\shaders\shadows\pointShadow.vs" />
     <None Include="assets\shaders\shadows\pointShadow.gs" />
     <None Include="assets\shaders\shadows\pointSpotShadow.fs" />
+    <None Include="assets\shaders\defaultHead.gh" />
+    <None Include="assets\shaders\test.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\forest1.jpg">

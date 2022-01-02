@@ -26,6 +26,7 @@
 #include "graphics/models/brickwall.hpp"
 
 #include "graphics/framememory.hpp"
+#include "graphics/uniformmemory.hpp"
 
 #include "physics/environment.h"
 
@@ -65,7 +66,7 @@ double lastFrame = 0.0f;
 //Cube cube(21);
 Lamp lamp(4);
 Brickwall wall;
-
+std::string Shader::defaultDirectory = "assets/shaders";
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
@@ -75,6 +76,30 @@ int main()
 	std::cout << vec.x << " " << vec.y << " " << vec.z << " " << std::endl;
 	std::cout << "Hello world" << std::endl;
 
+	UBO::UBO ubo({
+		UBO::Type::SCALAR,
+		UBO::newStruct({
+			UBO::newArray(5,UBO::Type::SCALAR),
+			UBO::Type::SCALAR,
+			UBO::newArray(2,UBO::newVec(3))
+			}),
+		UBO::newArray(2,UBO::newStruct({
+			UBO::newColMat(4,4),
+			UBO::newVec(3)
+			}))
+		});
+	ubo.startWrtie();
+	while (true)
+	{
+		UBO::Element e = ubo.getNextElement();
+		if (e.type == UBO::Type::INVALID)
+		{
+			break;
+		}
+		std::cout << e.typeStr() << std::endl;
+	}
+
+	return 0;
 	scene = Scene(3, 3, "Laberinto", 1920, 1080);
 	if (!scene.init())
 	{
@@ -84,24 +109,24 @@ int main()
 	}
 	scene.cameras.push_back(&camera);
 	scene.activeCamera = 0;
-
+	Shader::loadIntoDefault("defaultHead.gh");
 	//Shader shader("assets/object.vs", "assets/object.fs");
-	Shader gunShader("assets/shaders/object.vs", "assets/shaders/object.fs");
+	Shader gunShader(false,"object.vs", "object.fs");
 	//Shader lampShader("assets/shaders/instanced/instanced.vs", "assets/shaders/lamp.fs");
-	Shader shader("assets/shaders/instanced/instanced.vs", "assets/shaders/object.fs");
-	Shader boxShader("assets/shaders/instanced/box.vs", "assets/shaders/instanced/box.fs");
-	Shader textShader("assets/shaders/text.vs", "assets/shaders/text.fs");
-	Shader skyboxShader("assets/skybox/skybox.vs", "assets/skybox/skybox.fs");
+	Shader shader(true,"instanced/instanced.vs", "object.fs");
+	Shader boxShader(false,"instanced/box.vs", "instanced/box.fs");
+	Shader textShader(false,"text.vs", "text.fs");
+	Shader skyboxShader(false,"skybox.vs", "skybox.fs");
 	//Shader outlineShader("assets/shaders/outline.vs", "assets/shaders/outline.fs");
 	//Shader bufferShader("assets/shaders/buffer.vs", "assets/shaders/buffer.fs");
-	Shader dirShadowShader("assets/shaders/shadows/dirSpotShadow.vs",
-		"assets/shaders/shadows/dirShadow.fs");
-	Shader spotShadowShader("assets/shaders/shadows/dirSpotShadow.vs",
-		"assets/shaders/shadows/pointSpotShadow.fs");
-	Shader pointShadowShader("assets/shaders/shadows/pointShadow.vs",
-		"assets/shaders/shadows/pointSpotShadow.fs",
-		"assets/shaders/shadows/pointShadow.gs");
-
+	Shader dirShadowShader(false,"shadows/dirSpotShadow.vs",
+		"shadows/dirShadow.fs");
+	Shader spotShadowShader(false,"shadows/dirSpotShadow.vs",
+		"shadows/pointSpotShadow.fs");
+	Shader pointShadowShader(false,"shadows/pointShadow.vs",
+		"shadows/pointSpotShadow.fs",
+		"shadows/pointShadow.gs");
+	Shader::clearDefaults();
 	//skyboxShader.activate();
 	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
 	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);

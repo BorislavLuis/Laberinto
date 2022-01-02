@@ -4,21 +4,21 @@ Shader::Shader()
 {
 }
 
-Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath)
+Shader::Shader(bool includeDefaultHeader, const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath)
 {
-	generate(vertexShaderPath, fragmentShaderPath,geoShaderPath);
+	generate(includeDefaultHeader,vertexShaderPath, fragmentShaderPath,geoShaderPath);
 }
-void Shader::generate(const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath)
+void Shader::generate(bool includeDefaultHeader, const char* vertexShaderPath, const char* fragmentShaderPath, const char* geoShaderPath)
 {
 	int success;
 	char infoLog[512];
-	GLuint vertexShader = compileShader(vertexShaderPath, GL_VERTEX_SHADER);
-	GLuint fragmentShader = compileShader(fragmentShaderPath, GL_FRAGMENT_SHADER);
+	GLuint vertexShader = compileShader(includeDefaultHeader,vertexShaderPath, GL_VERTEX_SHADER);
+	GLuint fragmentShader = compileShader(includeDefaultHeader,fragmentShaderPath, GL_FRAGMENT_SHADER);
 	
 	GLuint geoShader = 0;
 	if (geoShaderPath)
 	{
-		geoShader = compileShader(geoShaderPath, GL_GEOMETRY_SHADER);
+		geoShader = compileShader(includeDefaultHeader,geoShaderPath, GL_GEOMETRY_SHADER);
 	}
 	id = glCreateProgram();
 	glAttachShader(id, vertexShader);
@@ -50,13 +50,31 @@ void Shader::activate()
 }
 
 
-std::string Shader::loadShaderSrc(const char* filename)
+void Shader::loadIntoDefault(const char* filepath)
+{
+	std::string fileContents = Shader::loadShaderSrc(false,filepath);
+	
+	Shader::defaultHeaders << fileContents;
+}
+
+void Shader::clearDefaults()
+{
+	Shader::defaultHeaders.clear();
+}
+
+std::string Shader::loadShaderSrc(bool includeDefaultHeader, const char* filename)
 {
 	std::ifstream file;
 	std::stringstream buf;
 	std::string ret = "";
 
-	file.open(filename);
+	if (includeDefaultHeader)
+	{
+		buf << Shader::defaultHeaders.str();
+	}
+	std::string fullPath = Shader::defaultDirectory + '/' + filename;
+
+	file.open(fullPath.c_str());
 
 	if (file.is_open())
 	{
@@ -72,13 +90,13 @@ std::string Shader::loadShaderSrc(const char* filename)
 	return ret;
 }
 
-GLuint Shader::compileShader(const char* filepath, GLenum type)
+GLuint Shader::compileShader(bool includeDefaultHeader, const char* filepath, GLenum type)
 {
 	int success;
 	char infoLog[512];
 	
 	unsigned int ret = glCreateShader(type);
-	std::string shaderSrc = loadShaderSrc(filepath);
+	std::string shaderSrc = loadShaderSrc(includeDefaultHeader, filepath);
 	const GLchar* shader = shaderSrc.c_str();
 	glShaderSource(ret, 1, &shader, NULL);
 	glCompileShader(ret);
@@ -88,7 +106,7 @@ GLuint Shader::compileShader(const char* filepath, GLenum type)
 	if (!success)
 	{
 		glGetShaderInfoLog(ret, 512, NULL, infoLog);
-		std::cout << "Error with shader comp: " << std::endl << infoLog << std::endl;
+		std::cout << "Error with shader comp: " << filepath  << ":" << std::endl << infoLog << std::endl;
 	}
 	return ret;
 }
@@ -132,3 +150,5 @@ void Shader::set4Float(const std::string& name, glm::vec4 v)
 {
 	glUniform4f(glGetUniformLocation(id, name.c_str()), v.x,v.y,v.z,v.w);
 }
+
+std::stringstream Shader::defaultHeaders;
