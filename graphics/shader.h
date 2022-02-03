@@ -25,7 +25,7 @@ public:
 	void activate();
 
 
-	GLuint compileShader(bool includeDefaultHeader,const char* filepath, GLenum type);
+	GLuint compileShader(bool includeDefaultHeader,const char* filepath, GLuint type);
 
 	void setMat4(const std::string& name, glm::mat4 val);
 	void setInt(const std::string& name, int val);

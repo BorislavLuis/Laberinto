@@ -4,19 +4,22 @@ struct Material
 	vec4 specular;
 	float shininess;
 };
+uniform Material material;
+uniform bool noTex;
+uniform bool noNormalMap;
+
+//#define MAX_POINT_LIGHTS 20
+//#define MAX_SPOT_LIGHTS 5
 
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 uniform sampler2D normal0;
 
-uniform PointLight pointLight[MAX_POINT_LIGHTS];
-uniform int noPointLights;
+uniform sampler2D dirLightBuffer;
+uniform samplerCube pointLightBuffers[MAX_POINT_LIGHTS];
+uniform sampler2D spotLightBuffers[MAX_SPOT_LIGHTS];
 
-uniform DirLight dirLight;
-
-
-uniform SpotLight spotLight[MAX_SPOT_LIGHTS];
-uniform int noSpotLights;
+out vec4 FragColor;
 
 in VS_OUT
 {
@@ -25,19 +28,15 @@ in VS_OUT
 	vec2 Tex_Coord;
 }fs_in;
 
-out vec4 FragColor;
 
-uniform Material material;
-uniform bool noTex;
-uniform bool noNormalMap;
 uniform bool skipNormalMapping;
 uniform vec3 viewPos;
 uniform bool useBlinn;
 uniform bool useGamma;
 
-float calcDirLightShadow(vec3 norm,vec3 viewVec,vec3 lightDir);
-float calcSpotLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir);
-float calcPointLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir);
+//float calcDirLightShadow(vec3 norm,vec3 viewVec,vec3 lightDir);
+//float calcSpotLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir);
+//float calcPointLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir);
 vec4 calcDirLight(vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap);
 vec4 calcPointLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap);
 vec4 calcSpotLight(int idx,vec3 norm,vec3 viewVec,vec3 viewDir,vec4 diffMap,vec4 specMap);
@@ -130,7 +129,7 @@ float calcDirLightShadow(vec3 norm,vec3 viewVec,vec3 lightDir)
 	float bias = max(maxBias *(1.0 - dot(norm,lightDir)),minBias);
 
 	float shadowSum = 0.0;
-	vec2 texelSize = 1.0 / textureSize(dirLight.depthBuffer,0);
+	vec2 texelSize = 1.0 / textureSize(dirLightBuffer,0);
 	float viewDist = length(viewVec);
 	float diskRadius = (1.0 +(viewDist/dirLight.farPlane))/30.0;
 
@@ -138,7 +137,7 @@ float calcDirLightShadow(vec3 norm,vec3 viewVec,vec3 lightDir)
 	{
 		for(int x = -1; x <= 1;x++)
 		{
-			float pcfDepth = texture(dirLight.depthBuffer,
+			float pcfDepth = texture(dirLightBuffer,
 				 projCoords.xy + vec2(x,y)*texelSize* diskRadius).r;
 			shadowSum += currentDepth-bias > pcfDepth ? 1.0:0.0;
 		}
@@ -205,14 +204,14 @@ float calcSpotLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir)
 	float bias = max(maxBias *(1.0 - dot(norm,lightDir)),minBias);
 
 	float shadowSum = 0.0;
-	vec2 texelSize = 1.0 / textureSize(spotLight[idx].depthBuffer,0);
+	vec2 texelSize = 1.0 / textureSize(spotLightBuffers[idx],0);
 	float viewDist = length(viewVec);
 	float diskRadius = (1.0 +(viewDist/spotLight[idx].farPlane))/30.0;
 	for(int y = -1;y <= 1;y++)
 	{
 		for(int x = -1; x <= 1;x++)
 		{
-			float pcfDepth = texture(spotLight[idx].depthBuffer,
+			float pcfDepth = texture(spotLightBuffers[idx],
 				 projCoords.xy + vec2(x,y)*texelSize * diskRadius).r;
 			
 			pcfDepth *= spotLight[idx].farPlane;
@@ -228,10 +227,6 @@ float calcPointLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir)
 {
 	vec3 lightToFrag = fs_in.FragPos - pointLight[idx].position;
 
-	float closestDepth = texture(pointLight[idx].depthBuffer,lightToFrag).r;
-
-	closestDepth*=pointLight[idx].farPlane;
-
 	float currentDepth = length(lightToFrag);
 
 	float minBias = 0.005;
@@ -244,7 +239,7 @@ float calcPointLightShadow(int idx,vec3 norm,vec3 viewVec,vec3 lightDir)
 
 	for(int i = 0;i < NUM_SAMPLE;i++ )
 	{
-		float pcfDepth = texture(pointLight[idx].depthBuffer,
+		float pcfDepth = texture(pointLightBuffers[idx],
 				lightToFrag + sampleOffsetDirections[i]*diskRadius).r;
 		pcfDepth *= pointLight[idx].farPlane;
 		

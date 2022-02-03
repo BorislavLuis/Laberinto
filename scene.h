@@ -18,6 +18,8 @@
 #include "graphics/text.h"
 #include "graphics/models/box.hpp"
 #include "graphics/framememory.hpp"
+#include "graphics/uniformmemory.hpp"
+
 
 #include "io/camera.h"
 #include "io/keyboard.h"
@@ -49,6 +51,7 @@ public:
 	trie::Trie<TextRenderer*> fonts;
 
 	FramebufferObject defaultFBO;
+	UBO::UBO lightUBO;
 
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -57,7 +60,7 @@ public:
 		const char* title, unsigned int scrWidth, unsigned int scrHeight);
 	bool init();
 
-	void prepare(Box& box);
+	void prepare(Box& box,std::vector<Shader> shaders);
 	void processInput(float dt);
 	void update();
 	void newFrame(Box& box);
@@ -87,8 +90,11 @@ public:
 
 	std::string currentId;
 	std::string generateId();
+	unsigned int noPointLights;
 	std::vector<PointLight*> pointLights;
 	unsigned int activePointLights;
+	
+	unsigned int noSpotLights;
 	std::vector<SpotLight*> spotLights;
 	unsigned int activeSpotLights;
 	DirLight* dirLight;

@@ -68,10 +68,6 @@ Lamp lamp(4);
 Brickwall wall;
 std::string Shader::defaultDirectory = "assets/shaders";
 
-struct Color
-{
-	glm::vec3 c;
-};
 int main()
 {
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
@@ -92,12 +88,12 @@ int main()
 	scene.activeCamera = 0;
 	Shader::loadIntoDefault("defaultHead.gh");
 	//Shader shader("assets/object.vs", "assets/object.fs");
-	Shader gunShader(false,"object.vs", "object.fs");
+	//Shader gunShader(false,"object.vs", "object.fs");
 	//Shader lampShader("assets/shaders/instanced/instanced.vs", "assets/shaders/lamp.fs");
 	Shader shader(true,"instanced/instanced.vs", "object.fs");
 	Shader boxShader(false,"instanced/box.vs", "instanced/box.fs");
 	Shader textShader(false,"text.vs", "text.fs");
-	Shader skyboxShader(false,"skybox.vs", "skybox.fs");
+	//Shader skyboxShader(false,"skybox.vs", "skybox.fs");
 	//Shader outlineShader("assets/shaders/outline.vs", "assets/shaders/outline.fs");
 	//Shader bufferShader("assets/shaders/buffer.vs", "assets/shaders/buffer.fs");
 	Shader dirShadowShader(false,"shadows/dirSpotShadow.vs",
@@ -109,41 +105,13 @@ int main()
 		"shadows/pointShadow.gs");
 	Shader::clearDefaults();
 
-	UBO::UBO ubo(0, {
-		UBO::newColMatArray(3,4,4)
-		});
-
-	ubo.attachToShader(shader, "Colors");
-	ubo.generate();
-	ubo.bind();
-	ubo.initNullData(GL_STATIC_DRAW);
-	ubo.clear();
-
-	ubo.bindRange();
-	ubo.startWrtie();
-
-	Color colorArray[3] =
-	{
-		{{1.0f,0.0f,0.0f}},
-		{{0.0f,1.0f,0.0f} },
-		{{0.0f,0.0f,1.0f}}
-	};
-
-	float fArr[3] = { 0.0f,0.0f,0.0f };
-	ubo.bind();
-	ubo.advanceArray(2 * 4);
-
-	glm::mat4 m = glm::translate(glm::mat4(1.0f), { 3.0f,0.0f,-5.0f });
-	ubo.writeArrayContainer < glm::mat4, glm::vec4>(&m, 4);
-	ubo.clear();
-
 	//skyboxShader.activate();
 	//skyboxShader.set3Float("min", 0.047f, 0.016f, 0.239f);
 	//skyboxShader.set3Float("max", 0.945f, 1.000f, 0.682f);
-	Cubemap skybox;
-	skybox.init();
-	skybox.loadTexture("assets/skybox");
-	shader.activate();
+	//Cubemap skybox;
+	//skybox.init();
+	//skybox.loadTexture("assets/skybox");
+	//shader.activate();
 	
 
 	//g.loadModel("assets/textures/models/m4a1/scene.gltf");
@@ -189,7 +157,7 @@ int main()
 
 	PointLight pointLights[4];
 
-	for (unsigned int i = 0; i < 1; i++)
+	for (unsigned int i = 0; i < 4; i++)
 	{
 		pointLights[i] = PointLight(
 				pointLightPositions[i],
@@ -232,7 +200,7 @@ int main()
 
 	scene.generateInstance(wall.id, glm::vec3(1.0f), 1.0f, glm::vec3(0.0f, 0.0f, -2.0f));
 	scene.initInstances();
-	scene.prepare(box);
+	scene.prepare(box, { shader });
 
 	scene.variableLog["time"] = (double)0.0;
 	scene.defaultFBO.bind();
@@ -278,28 +246,28 @@ int main()
 		//	glStencilMask(0x00);  
 		//}
 
-		//scene.renderDirLightShader(dirShadowShader);
-		//renderScene(dirShadowShader);
+		scene.renderDirLightShader(dirShadowShader);
+		renderScene(dirShadowShader);
 		
-		//for (unsigned int i = 0, len = scene.pointLights.size(); i < len; i++)
-		//{
-		//	if (States::isIndexActive(&scene.activePointLights, i))
-		//	{
-		//		scene.pointLights[i]->shadowFBO.activate();
-		//		scene.renderPointLightShader(pointShadowShader, i);
-		//		renderScene(pointShadowShader);
-		//	}
-		//}
+		for (unsigned int i = 0, len = scene.pointLights.size(); i < len; i++)
+		{
+			if (States::isIndexActive(&scene.activePointLights, i))
+			{
+				scene.pointLights[i]->shadowFBO.activate();
+				scene.renderPointLightShader(pointShadowShader, i);
+				renderScene(pointShadowShader);
+			}
+		}
 
-		//for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
-		//{
-		//	if (States::isIndexActive(&scene.activeSpotLights, i))
-		//	{
-		//		scene.spotLights[i]->shadowFBO.activate();
-		//		scene.renderSpotLightShader(spotShadowShader,i);
-		//		renderScene(spotShadowShader);
-		//	}
-		//}
+		for (unsigned int i = 0, len = scene.spotLights.size(); i < len; i++)
+		{
+			if (States::isIndexActive(&scene.activeSpotLights, i))
+			{
+				scene.spotLights[i]->shadowFBO.activate();
+				scene.renderSpotLightShader(spotShadowShader,i);
+				renderScene(spotShadowShader);
+			}
+		}
 	
 		scene.defaultFBO.activate();
 		scene.renderShader(shader);
@@ -338,8 +306,8 @@ int main()
 		//scene.renderShader(shader);
 		//scene.renderInstances(troll.id, shader, dt);
 
-		//scene.renderShader(boxShader,false);
-		//box.render(boxShader);
+		scene.renderShader(boxShader,false);
+		box.render(boxShader);
 		//
 		//scene.defaultFBO.activate();
 		//scene.renderInstances(map.id, bufferShader, dt);

@@ -90,7 +90,7 @@ std::string Shader::loadShaderSrc(bool includeDefaultHeader, const char* filenam
 	return ret;
 }
 
-GLuint Shader::compileShader(bool includeDefaultHeader, const char* filepath, GLenum type)
+GLuint Shader::compileShader(bool includeDefaultHeader, const char* filepath, GLuint type)
 {
 	int success;
 	char infoLog[512];

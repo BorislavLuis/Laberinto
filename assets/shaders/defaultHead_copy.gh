@@ -1,7 +1,6 @@
 #version 330 core
 
-struct DirLight
-{
+struct DirLight {
 	vec3 direction;
 
 	vec4 ambient;
@@ -12,9 +11,9 @@ struct DirLight
 
 	mat4 lightSpaceMatrix;
 };
-#define MAX_POINT_LIGHTS 20
-struct PointLight
-{
+
+#define MAX_POINT_LIGHTS 10
+struct PointLight {
 	vec3 position;
 
 	vec4 ambient;
@@ -26,11 +25,10 @@ struct PointLight
 	float k2;
 
 	float farPlane;
-	
 };
-#define MAX_SPOT_LIGHTS 4
-struct SpotLight
-{
+
+#define MAX_SPOT_LIGHTS 2
+struct SpotLight {
 	vec3 position;
 	vec3 direction;
 
@@ -51,13 +49,26 @@ struct SpotLight
 	mat4 lightSpaceMatrix;
 };
 
-layout (std140) uniform Lights
-{
+struct TangentLights {
+	vec3 FragPos;
+	vec3 Normal;
+
+	vec3 viewPos;
+
+	vec3 dirLightDirection;
+
+	vec3 pointLightPositions[MAX_POINT_LIGHTS];
+
+	vec3 spotLightPositions[MAX_SPOT_LIGHTS];
+	vec3 spotLightDirections[MAX_SPOT_LIGHTS];
+};
+
+layout (std140) uniform Lights {
 	DirLight dirLight;
 
 	int noPointLights;
-	PointLight pointLight[MAX_POINT_LIGHTS];
+	PointLight pointLights[MAX_POINT_LIGHTS];
 
 	int noSpotLights;
-	SpotLight spotLight[MAX_SPOT_LIGHTS];
+	SpotLight spotLights[MAX_SPOT_LIGHTS];
 };

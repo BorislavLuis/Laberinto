@@ -24,7 +24,7 @@ namespace UBO
 		INVALID
 	};
 
-	unsigned int roundUpPow2(unsigned int val, unsigned char n)
+	inline unsigned int roundUpPow2(unsigned int val, unsigned char n)
 	{
 		unsigned int pow2n = 0b1 << n;
 		unsigned int divisor = pow2n - 1;
@@ -132,11 +132,11 @@ namespace UBO
 
 	}Element;
 
-	Element newScalar()
+	inline Element newScalar()
 	{
 		return Element();
 	}
-	Element newVec(unsigned char dim)
+	inline Element newVec(unsigned char dim)
 	{
 		switch (dim)
 		{
@@ -147,8 +147,7 @@ namespace UBO
 			return Type::VEC4;
 		}
 	}
-
-	Element newArray(unsigned int length, Element arrElement)
+	inline Element newArray(unsigned int length, Element arrElement)
 	{
 		Element ret(Type::ARRAY);
 		ret.length = length;
@@ -160,26 +159,23 @@ namespace UBO
 			roundUpPow2(arrElement.baseAlign, 4);
 		return ret;
 	}
-
-	Element newColMat(unsigned char cols, unsigned char rows)
+	inline Element newColMat(unsigned char cols, unsigned char rows)
 	{
 		return newArray(cols, newVec(rows));
 	}
-
-	Element newColMatArray(unsigned int noMatrices, unsigned char cols, unsigned char rows)
+	inline Element newColMatArray(unsigned int noMatrices, unsigned char cols, unsigned char rows)
 	{
 		return newArray(noMatrices * cols, newVec(cols));
 	}
-
-	Element newRowMat(unsigned char rows, unsigned char cols)
+	inline Element newRowMat(unsigned char rows, unsigned char cols)
 	{
 		return newArray(rows, newVec(cols));
 	}
-	Element newRowMatArray(unsigned int noMatrices, unsigned char rows, unsigned cols)
+	inline Element newRowMatArray(unsigned int noMatrices, unsigned char rows, unsigned cols)
 	{
 		return newArray(noMatrices * rows, newVec(cols));
 	}
-	Element newStruct(std::vector<Element> subelements)
+	inline Element newStruct(std::vector<Element> subelements)
 	{
 		Element ret(Type::STRUCT);
 		ret.list.insert(ret.list.end(), subelements.begin(), subelements.end());
@@ -434,6 +430,8 @@ namespace UBO
 
 			offset += advanceCount * roundUpPow2(currentElement->list[0].calcSize(), currentElement->alignPow2());
 			
+			indexStack[currentDepth].first += advanceCount;
+
 			poppedOffset = offset;
 			if (pop())
 			{
