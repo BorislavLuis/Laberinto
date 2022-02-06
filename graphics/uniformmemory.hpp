@@ -14,7 +14,6 @@ namespace UBO
 {
 	enum class Type : unsigned char
 	{
-	
 		SCALAR = 0,
 		VEC2,
 		VEC3,
@@ -290,20 +289,6 @@ namespace UBO
 				currentDepth++;
 				indexStack.push_back({ 0,currentElement });
 				currentElement = &currentElement->list[0];
-			}
-
-			for (int i = currentDepth; i >= 0; i--)
-			{
-				int advanceIdx = ++indexStack[i].first;
-				if (advanceIdx >= indexStack[i].second->length)
-				{
-					indexStack.erase(indexStack.begin() + i);
-					currentDepth--;
-				}
-				else
-				{
-					break;
-				}
 			}
 
 			poppedOffset = roundUpPow2(offset, currentElement->alignPow2())+currentElement->calcSize();

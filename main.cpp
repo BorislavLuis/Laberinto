@@ -157,7 +157,7 @@ int main()
 
 	PointLight pointLights[4];
 
-	for (unsigned int i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 1; i++)
 	{
 		pointLights[i] = PointLight(
 				pointLightPositions[i],

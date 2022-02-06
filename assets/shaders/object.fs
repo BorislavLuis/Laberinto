@@ -8,9 +8,6 @@ uniform Material material;
 uniform bool noTex;
 uniform bool noNormalMap;
 
-//#define MAX_POINT_LIGHTS 20
-//#define MAX_SPOT_LIGHTS 5
-
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 uniform sampler2D normal0;
