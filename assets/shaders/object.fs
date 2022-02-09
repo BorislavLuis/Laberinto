@@ -22,7 +22,7 @@ in VS_OUT
 {
 	vec3 FragPos;
 	vec3 Normal;
-	vec2 Tex_Coord;
+	vec2 TexCoord;
 }fs_in;
 
 
@@ -56,7 +56,7 @@ void main()
 
 	if(!noNormalMap && !skipNormalMapping)
 	{
-		norm = texture(normal0,fs_in.Tex_Coord).rgb;
+		norm = texture(normal0,fs_in.TexCoord).rgb;
 		norm = normalize(norm*2.0 - 1.0);
 	}
 
@@ -73,8 +73,8 @@ void main()
 	}
 	else
 	{
-		diffMap = texture(diffuse0,fs_in.Tex_Coord);
-		specMap = texture(specular0,fs_in.Tex_Coord);
+		diffMap = texture(diffuse0,fs_in.TexCoord);
+		specMap = texture(specular0,fs_in.TexCoord);
 	}
 	vec4 result = vec4(0.0,0.0,0.0,1.0);
 	
