@@ -116,6 +116,11 @@ void Shader::setMat4(const std::string& name, glm::mat4 val)
 	glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE,glm::value_ptr(val));
 }
 
+void Shader::setMat3(const std::string& name, glm::mat3 val)
+{
+	glUniformMatrix3fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));
+}
+
 void Shader::setInt(const std::string& name, int val)
 {
 	glUniform1i(glGetUniformLocation(id, name.c_str()),val);

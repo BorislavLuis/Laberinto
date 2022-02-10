@@ -28,6 +28,7 @@ public:
 	GLuint compileShader(bool includeDefaultHeader,const char* filepath, GLuint type);
 
 	void setMat4(const std::string& name, glm::mat4 val);
+	void setMat3(const std::string& name, glm::mat3 val);
 	void setInt(const std::string& name, int val);
 	void setBool(const std::string& name, bool val);
 	void setFloat(const std::string& name, float val);

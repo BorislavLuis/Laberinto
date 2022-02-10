@@ -54,9 +54,9 @@ void Model::initInstances()
 
 		meshes[i].VAO.bind();
 		posVBO.bind();
-		posVBO.setAttPointer<glm::vec3>(3, 3, GL_FLOAT, 1, 0, 1);
+		posVBO.setAttPointer<glm::vec3>(4, 3, GL_FLOAT, 1, 0, 1);
 		sizeVBO.bind();
-		sizeVBO.setAttPointer<glm::vec3>(4, 3, GL_FLOAT, 1, 0, 1);
+		sizeVBO.setAttPointer<glm::vec3>(5, 3, GL_FLOAT, 1, 0, 1);
 
 		ArrayObject::clear();
 	}
@@ -92,12 +92,11 @@ unsigned int Model::getIdx(std::string id)
 	return -1;
 }
 
-void Model::render(Shader shader, float dt, Scene* scene, bool setModel)
+void Model::render(Shader shader, float dt, Scene* scene,glm::mat4 model)
 {
-	if (setModel)
-	{
-		shader.setMat4("model", glm::mat4(1.0f));
-	}
+	shader.setMat4("model", model);
+	shader.setMat3("normalModel", glm::transpose(glm::inverse(glm::mat3(model))));
+
 	if (!States::isActive(&switches, CONST_INSTANCES))
 	{
 		std::vector<glm::vec3> position, sizes;
@@ -146,7 +145,8 @@ void Model::init() {}
 void Model::loadModel(std::string path)
 {
 	Assimp::Importer import;
-	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = import.ReadFile(path, 
+		aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -214,6 +214,13 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		{
 			vertex.texCoord = glm::vec2(0.0f);
 		}
+
+		vertex.tangent = {
+			mesh->mTangents[i].x,
+			mesh->mTangents[i].y,
+			mesh->mTangents[i].z
+		};
+
 		vertices.push_back(vertex);
 	}
 
@@ -268,7 +275,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			// 2. specular colors
 			aiColor4D spec(1.0f);
 			aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &spec);
-
 			ret = Mesh(br, diff, spec);
 		}
 		else {
@@ -278,7 +284,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 			// 2. specular maps
 			std::vector<Texture> specularMaps = loadTextures(material, aiTextureType_SPECULAR);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
+			// 3. normal vector
+			// .obj, use aiTextureType_Height
+			std::vector<Texture> normalMaps = loadTextures(material, aiTextureType_NORMALS);
+			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 			ret = Mesh(br, textures);
 		}
 	}
